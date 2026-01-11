@@ -44,11 +44,25 @@ public class requestPart extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		Integer technicianId = (Integer) session.getAttribute("userID");
+		
 		int technicianIds = (int) session.getAttribute("userID");
+		
+		reqPartDAO dao2 = new reqPartDAO();
+		
+		reqPartDAO dao = new reqPartDAO();
+		
+		reqPartDAO dao3 = new reqPartDAO();
 		
 		List<reqPart> reqsPart = new ArrayList<>();
 		
-		List<partTrack> repairIDs = new ArrayList<>();
+		
+		int totalRequests = dao.countTotalPartRequests(technicianIds);
+		int totalPending = dao2.countTotalPartPending(technicianIds);
+		int totalApproved = dao3.countTotalPartApproved(technicianIds);
+		
+		request.setAttribute("partReqCount", totalRequests);
+		request.setAttribute("partPenCount", totalPending);
+		request.setAttribute("partApproveCount", totalApproved);
 		
 
 
@@ -75,46 +89,8 @@ public class requestPart extends HttpServlet {
             String repairSql = "SELECT DISTINCT repairID FROM repair WHERE assignedTech = ?";
             PreparedStatement stmt = con.prepareStatement(repairSql);
             stmt.setInt(1, technicianIds);
-    		
-            ResultSet sp = stmt.executeQuery();
-            while(sp.next()) {
-            	partTrack pt = new partTrack(
-            			sp.getInt("RepairID")
-            			);
-            	
-            	repairIDs.add(pt);    
-            	
-            }
-    		
-    		session.setAttribute("repairIDs", repairIDs);
-    		
-            System.out.println("Repair IDs sent to JSP: " + repairIDs);
 
-    	        // 2️⃣ Call DAO to fetch assigned repair jobs
-    		
-    		//for tracking job in the select option
-    		
-    	/**
-    	try {
-    		String assignedJob = "SELECT RepairID FROM repair WHERE AssignedTech = ?";
-    		
-    		PreparedStatement aj = con.prepareStatement(assignedJob);
-    		aj.setInt(1, technicianId);
-    		ResultSet ajs = aj.executeQuery();
-    		
-    		while(ajs.next()) {
-    			assignedRepairIDs.add(ajs.getInt("RepairID"));
-    		}
-    		
-    		session.setAttribute("assignedRepairIDs", assignedRepairIDs);
-    	     request.getRequestDispatcher("technicianRequest.jsp").forward(request, response);
-    		
-    	}catch (Exception e) {e.printStackTrace();}
-    	**/ 
-
-                    
-
-    	        
+	        
            PreparedStatement ps = con.prepareStatement(sql);
            ps.setInt(1, technicianId);
            ResultSet rs = ps.executeQuery();

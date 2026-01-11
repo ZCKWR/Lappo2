@@ -79,19 +79,19 @@ import="techModel.partTrack"%>
                 <div class="stat-card">
                     <div class="stat-info">
                         <h3>Part Requested</h3>
-                        <p class="number"><%= totalReq %></p>
+                        <p class="number"><%= request.getAttribute("partReqCount") %></p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-info">
                         <h3>Pending</h3>
-                        <p class="number" style="color: var(--warning-color);">2</p>
+                        <p class="number" style="color: var(--warning-color);"><%= request.getAttribute("partPenCount") %></p>
                     </div>                   
                 </div>
                 <div class="stat-card">
                     <div class="stat-info">
                         <h3>Approved</h3>
-                        <p class="number" style="color: green">3</p>
+                        <p class="number" style="color: green"><%= request.getAttribute("partApproveCount") %></p>
                     </div>                   
                 </div>
             </div>
