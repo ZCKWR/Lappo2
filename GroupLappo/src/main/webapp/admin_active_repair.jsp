@@ -1,57 +1,31 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, java.util.*, java.text.SimpleDateFormat" %>
+<%@ page import="adminDAO.repairDAO, adminDAO.userDAO, java.util.*, java.text.SimpleDateFormat" %>
 
 <%
-    String dbURL = "jdbc:mysql://localhost:3306/lappo2";
-    String dbUser = "root";
-    String dbPass = "Zack1234!";
-
-    List<Map<String, Object>> repairsList = new ArrayList<>();
-    // Storing technicians as a Map to keep both ID and Name
-    List<Map<String, String>> technicianList = new ArrayList<>();
-
-    try {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection con = DriverManager.getConnection(dbURL, dbUser, dbPass);
-        
-        // 1. Fetch Technicians (Need UserID for the dropdown value)
-        Statement stTech = con.createStatement();
-        ResultSet rsTech = stTech.executeQuery("SELECT UserID, Username FROM User WHERE UserType = 'Technician'");
-        while(rsTech.next()){
-            Map<String, String> t = new HashMap<>();
-            t.put("id", rsTech.getString("UserID"));
-            t.put("name", rsTech.getString("Username"));
-            technicianList.add(t);
-        }
-
-        // 2. Fetch Repairs using your new column names (CustomerID, AssignedTech)
-        String repairQuery = "SELECT r.RepairID, u.Username AS CustomerName, u.UserID AS CustomerID, " +
-                            "r.LaptopModel, r.CurrentStatus, r.DateIssued, tech.Username AS TechName, " +
-                            "(i.LabourCost + i.PartCost) AS CalculatedPrice " +
-                            "FROM Repair r " +
-                            "JOIN User u ON r.CustomerID = u.UserID " + 
-                            "LEFT JOIN User tech ON r.AssignedTech = tech.UserID " +
-                            "LEFT JOIN Invoice i ON r.RepairID = i.RepairID " + 
-                            "ORDER BY r.DateIssued DESC";
-        
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery(repairQuery);
-        while(rs.next()){
-            Map<String, Object> repair = new HashMap<>();
-            repair.put("id", rs.getInt("RepairID"));
-            repair.put("customer", rs.getString("CustomerName"));
-            repair.put("customerId", rs.getString("CustomerID"));
-            repair.put("device", rs.getString("LaptopModel"));
-            repair.put("techName", rs.getString("TechName")); 
-            repair.put("status", rs.getString("CurrentStatus"));
-            repair.put("date", rs.getTimestamp("DateIssued"));
-            repair.put("price", rs.getObject("CalculatedPrice")); 
-            repairsList.add(repair);
-        }
-        con.close();
-    } catch (Exception e) {
-        out.println("<div style='color:red; background:white; padding:10px;'>Database Error: " + e.getMessage() + "</div>");
+    // 1. Get the ID stored by your LoginController session
+    Integer userId = (Integer) session.getAttribute("userID");
+    
+    // 2. Security Check: If session is null, redirect to Login
+    if (userId == null) {
+        response.sendRedirect("LoginPage.jsp");
+        return;
     }
+
+    // 3. Fetch the full user details using the DAO method we added
+    userDAO uDao = new userDAO();
+    Map<String, String> profile = uDao.getUserProfile(userId);
+    
+    // If for some reason the database record is missing
+    if (profile.isEmpty()) {
+        out.println("Error: User profile not found in database.");
+        return;
+    }
+%>
+<%
+    // Initialize DAO and fetch data
+    repairDAO dao = new repairDAO();
+    List<Map<String, Object>> repairsList = dao.getAllRepairs();
+    List<Map<String, String>> technicianList = dao.getTechnicians();
 %>
 
 <!DOCTYPE html>
@@ -61,6 +35,14 @@
     <title>Lappo Admin - Active Repairs</title>
     <link rel="stylesheet" href="CSS/AllAdminCSS.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Ensuring badges have enough contrast */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+        .badge-pending { background: #f1c40f; color: #fff; }
+        .badge-inprogress { background: #3498db; color: #fff; }
+        .badge-completed { background: #2ecc71; color: #fff; }
+        .badge-tech { background: #9b59b6; color: #fff; }
+    </style>
 </head>
 <body>
 
@@ -77,7 +59,14 @@
         </nav>
 
         <main class="main-content">
-            <header class="top-header"><h1>Active Repairs</h1></header>
+            <header class="top-header">
+                <h1>Active Repairs</h1>
+                <% if(request.getParameter("status") != null) { %>
+                    <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        Update Successful: <%= request.getParameter("status") %>
+                    </div>
+                <% } %>
+            </header>
 
             <div class="filter-tabs">
                 <div class="filter-tab active" onclick="filterTable('All', this)">All Repairs</div>
@@ -111,7 +100,7 @@
                         <tr class="repair-row" data-status="<%= status %>">
                             <td>
                                 <strong>#REQ-<%= r.get("id") %></strong><br>
-                                <span style="font-size: 0.85em; color: var(--light-text-color);"><%= sdf.format(r.get("date")) %></span>
+                                <span style="font-size: 0.85em; color: gray;"><%= sdf.format(r.get("date")) %></span>
                             </td>
                             <td>
                                 <strong><%= r.get("customer") %></strong><br>
@@ -123,11 +112,11 @@
                             <td><%= displayPrice %></td>
                             <td>
                                 <% if(!status.equalsIgnoreCase("Completed")) { %>
-                                    <button class="btn-sm btn-view" onclick="openAssignModal('<%= r.get("id") %>')">
+                                    <button class="btn-sm" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openAssignModal('<%= r.get("id") %>')">
                                         <%= techName.equals("Unassigned") ? "Assign" : "Change Tech" %>
                                     </button>
                                 <% } else { %>
-                                    <span class="locked-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Done</span>
                                 <% } %>
                             </td>
                         </tr>
@@ -144,20 +133,20 @@
                 <h2>Assign Technician</h2>
                 <button class="close-btn" onclick="closeAssignModal()">&times;</button>
             </div>
-            <form action="UpdateTech.jsp" method="POST">
+            <form action="AssignTech" method="POST">
                 <input type="hidden" name="repairId" id="jobIdInput">
                 <div class="form-group">
                     <label>Select Technician</label>
-                    <select name="techUserId" required>
+                    <select name="techUserId" required style="width: 100%; padding: 8px; margin-top: 5px;">
                         <option value="">-- Choose a Technician --</option>
                         <% for(Map<String, String> tech : technicianList) { %>
                             <option value="<%= tech.get("id") %>"><%= tech.get("name") %></option>
                         <% } %>
                     </select>
                 </div>
-                <div class="modal-actions">
+                <div class="modal-actions" style="margin-top: 20px; text-align: right;">
                     <button type="button" class="btn-cancel" onclick="closeAssignModal()">Cancel</button>
-                    <button type="submit" class="btn-save">Update Technician</button>
+                    <button type="submit" class="btn-save" style="background:#27ae60; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Update Technician</button>
                 </div>
             </form>
         </div>

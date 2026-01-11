@@ -1,42 +1,37 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, java.util.*" %>
-
+<%@ page import="java.util.*, adminDAO.userDAO" %>
 <%
-    // Database Configuration
-    String dbURL = "jdbc:mysql://localhost:3306/lappo2";
-    String dbUser = "root";
-    String dbPass = "Zack1234!";
+    // 1. Get the ID stored by your LoginController session
+    Integer userId = (Integer) session.getAttribute("userID");
+    
+    // 2. Security Check: If session is null, redirect to Login
+    if (userId == null) {
+        response.sendRedirect("LoginPage.jsp");
+        return;
+    }
 
-    List<Map<String, String>> userList = new ArrayList<>();
+    // 3. Fetch the full user details using the DAO method we added
+    userDAO uDao = new userDAO();
+    Map<String, String> profile = uDao.getUserProfile(userId);
+    
+    // If for some reason the database record is missing
+    if (profile.isEmpty()) {
+        out.println("Error: User profile not found in database.");
+        return;
+    }
+%>
+<%
+    // Initialize DAO and fetch data
+    userDAO userDAO = new userDAO();
+    List<Map<String, String>> userList = userDAO.getAllUsers();
+
+    // Counters for the filter tabs
     int studentCount = 0, techCount = 0, adminCount = 0;
-
-    try {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection con = DriverManager.getConnection(dbURL, dbUser, dbPass);
-        
-        // Fetch all users to populate the table and counters
-        String query = "SELECT UserID, Username, UserEmail, UserType FROM User ORDER BY UserID ASC";
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery(query);
-
-        while(rs.next()){
-            Map<String, String> user = new HashMap<>();
-            String type = rs.getString("UserType");
-            
-            user.put("id", rs.getString("UserID"));
-            user.put("name", rs.getString("Username"));
-            user.put("email", rs.getString("UserEmail"));
-            user.put("type", type);
-
-            if("Student".equalsIgnoreCase(type)) studentCount++;
-            else if("Technician".equalsIgnoreCase(type)) techCount++;
-            else if("Admin".equalsIgnoreCase(type)) adminCount++;
-
-            userList.add(user);
-        }
-        con.close();
-    } catch (Exception e) {
-        e.printStackTrace();
+    for(Map<String, String> user : userList) {
+        String type = user.get("type");
+        if("Student".equalsIgnoreCase(type)) studentCount++;
+        else if("Technician".equalsIgnoreCase(type)) techCount++;
+        else if("Admin".equalsIgnoreCase(type)) adminCount++;
     }
 %>
 
@@ -101,28 +96,35 @@
                     </thead>
                     <tbody>
                         <% for(Map<String, String> user : userList) { 
+                            String type = user.get("type");
                             String roleClass = "badge-student";
                             String iconClass = "fa-user";
-                            if("Admin".equalsIgnoreCase(user.get("type"))) { roleClass = "badge-admin"; iconClass="fa-user-shield"; }
-                            else if("Technician".equalsIgnoreCase(user.get("type"))) { roleClass = "badge-tech"; iconClass="fa-tools"; }
+                            
+                            if("Admin".equalsIgnoreCase(type)) { 
+                                roleClass = "badge-admin"; 
+                                iconClass = "fa-user-shield"; 
+                            } else if("Technician".equalsIgnoreCase(type)) { 
+                                roleClass = "badge-tech"; 
+                                iconClass = "fa-tools"; 
+                            }
                         %>
-                        <tr class="user-row" data-role="<%= user.get("type") %>">
+                        <tr class="user-row" data-role="<%= type %>">
                             <td>
                                 <div class="user-cell">
                                     <div class="user-avatar-small"><i class="fas <%= iconClass %>"></i></div>
                                     <div>
                                         <strong><%= user.get("name") %></strong><br>
-                                        <span style="font-size: 0.85em; color: var(--light-text-color);">ID: <%= user.get("id") %></span>
+                                        <span style="font-size: 0.85em; color: #7f8c8d;">ID: <%= user.get("id") %></span>
                                     </div>
                                 </div>
                             </td>
-                            <td><span class="badge <%= roleClass %>"><%= user.get("type") %></span></td>
+                            <td><span class="badge <%= roleClass %>"><%= type %></span></td>
                             <td><%= user.get("email") %></td>
                             <td style="text-align: center;">
-                                <button class="btn-sm btn-edit" onclick="openEditModal('<%= user.get("id") %>', '<%= user.get("name") %>', '<%= user.get("email") %>', '<%= user.get("type") %>')">
+                                <button class="btn-sm btn-edit" onclick="openEditModal('<%= user.get("id") %>', '<%= user.get("name") %>', '<%= user.get("email") %>', '<%= type %>')">
                                     <i class="fas fa-pen"></i>
                                 </button>
-                                <% if(!"Admin".equalsIgnoreCase(user.get("type"))) { %>
+                                <% if(!"Admin".equalsIgnoreCase(type)) { %>
                                     <button class="btn-sm btn-delete" onclick="confirmDelete('<%= user.get("id") %>')">
                                         <i class="fas fa-ban"></i>
                                     </button>
@@ -142,7 +144,7 @@
                 <h2>Add New User</h2>
                 <button class="close-btn" onclick="closeModal('addUserModal')">&times;</button>
             </div>
-            <form action="AddUser.jsp" method="POST">
+            <form action="AddUser" method="POST">
                 <div class="form-group"><label>Full Name</label><input type="text" name="userName" required></div>
                 <div class="form-group"><label>Email Address</label><input type="email" name="userEmail" required></div>
                 <div class="form-group"><label>Password</label><input type="password" name="userPassword" required></div>
@@ -170,7 +172,7 @@
                 <h2>Edit User</h2>
                 <button class="close-btn" onclick="closeModal('editUserModal')">&times;</button>
             </div>
-            <form action="UpdateUser.jsp" method="POST">
+            <form action="UpdateUser" method="POST">
                 <input type="hidden" name="userId" id="editUserId">
                 <div class="form-group"><label>Full Name</label><input type="text" name="userName" id="editName" required></div>
                 <div class="form-group"><label>Email Address</label><input type="email" name="userEmail" id="editEmail" required></div>
@@ -220,7 +222,8 @@
 
         function confirmDelete(id) {
             if(confirm("Are you sure you want to delete User ID: " + id + "?")) {
-                window.location.href = "DeleteUser.jsp?userId=" + id;
+                // Point to the Delete Controller servlet
+                window.location.href = "DeleteUser?userId=" + id;
             }
         }
     </script>
