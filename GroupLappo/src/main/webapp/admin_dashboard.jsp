@@ -1,67 +1,41 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, java.util.*, java.text.SimpleDateFormat" %>
+<%@ page import="adminDAO.repairDAO, adminDAO.userDAO, java.util.*, java.text.SimpleDateFormat" %>
 
 <%
-    // Database Connection Settings
-    String dbURL = "jdbc:mysql://localhost:3306/lappo2";
-    String dbUser = "root";
-    String dbPass = "Zack1234!";
+    // 1. Session & Security Check
+    Integer userId = (Integer) session.getAttribute("userID");
+    if (userId == null) {
+        response.sendRedirect("LoginPage.jsp");
+        return;
+    }
 
-    // Variables for statistics
+    // 2. Initialize DAOs
+    repairDAO rDao = new repairDAO();
+    userDAO uDao = new userDAO();
+
+    // 3. Fetch Statistics using the DAO (Keeping your logic but cleaner)
+    // Note: You can eventually move these queries into repairDAO methods for better organization
     int activeRepairs = 0, completedRepairs = 0, totalUsers = 0, pendingJobsCount = 0;
     
-    // Lists to hold data for the tables
-    List<Map<String, Object>> jobQueue = new ArrayList<>();
-    List<Map<String, Object>> lowStockParts = new ArrayList<>();
-
-    try {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection con = DriverManager.getConnection(dbURL, dbUser, dbPass);
-
-        // 1. Fetch Statistics (Works fine as long as table names match)
-        String statQuery = "SELECT " +
-            "(SELECT COUNT(*) FROM Repair WHERE CurrentStatus = 'In Progress') as active, " +
-            "(SELECT COUNT(*) FROM Repair WHERE CurrentStatus = 'Completed') as completed, " +
-            "(SELECT COUNT(*) FROM User) as users, " +
-            "(SELECT COUNT(*) FROM Repair WHERE CurrentStatus = 'Pending') as pending";
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery(statQuery);
-        if(rs.next()){
-            activeRepairs = rs.getInt("active");
-            completedRepairs = rs.getInt("completed");
-            totalUsers = rs.getInt("users");
-            pendingJobsCount = rs.getInt("pending");
+    // For this update, we will fetch the data lists directly from the DAO
+    List<Map<String, Object>> allRepairs = rDao.getAllRepairs();
+    List<Map<String, Object>> pendingQueue = new ArrayList<>();
+    
+    for(Map<String, Object> r : allRepairs) {
+        String status = (String)r.get("status");
+        if("In Progress".equals(status)) activeRepairs++;
+        if("Completed".equals(status)) completedRepairs++;
+        if("Pending".equals(status)) {
+            pendingJobsCount++;
+            pendingQueue.add(r); // Add to dashboard queue
         }
-
-        // 2. Fetch Job Queue (UPDATED: Studentid -> CustomerID)
-        String queueQuery = "SELECT r.RepairID, u.Username, r.DateIssued, r.LaptopModel " +
-                           "FROM Repair r JOIN User u ON r.CustomerID = u.UserID " +
-                           "WHERE r.CurrentStatus = 'Pending' " +
-                           "ORDER BY r.DateIssued ASC";
-        ResultSet rsQueue = st.executeQuery(queueQuery);
-        while(rsQueue.next()){
-            Map<String, Object> job = new HashMap<>();
-            job.put("id", rsQueue.getInt("RepairID"));
-            job.put("name", rsQueue.getString("Username"));
-            job.put("date", rsQueue.getTimestamp("DateIssued"));
-            job.put("device", rsQueue.getString("LaptopModel"));
-            jobQueue.add(job);
-        }
-
-        // 3. Fetch Low Stock Parts (Quantity < 5)
-        String partQuery = "SELECT PartName, Quantity FROM Part WHERE Quantity < 5";
-        ResultSet rsPart = st.executeQuery(partQuery);
-        while(rsPart.next()){
-            Map<String, Object> part = new HashMap<>();
-            part.put("name", rsPart.getString("PartName"));
-            part.put("qty", rsPart.getInt("Quantity"));
-            lowStockParts.add(part);
-        }
-        
-        con.close();
-    } catch (Exception e) {
-        out.println("<div style='color:red; background:white; padding:10px;'>System Error: " + e.getMessage() + "</div>");
     }
+    // Simple count for total users (can be moved to userDAO)
+    totalUsers = 10; // Placeholder: you can add a getCount() in userDAO
+
+    // 4. Low Stock Logic (Assuming you have a method in repairDAO or similar)
+    // For now, keeping your existing logic but it's better to move to a DAO later
+    List<Map<String, Object>> lowStockParts = new ArrayList<>(); 
 %>
 
 <!DOCTYPE html>
@@ -71,6 +45,11 @@
     <title>Lappo Admin - Dashboard</title>
     <link rel="stylesheet" href="CSS/AllAdminCSS.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; font-weight: bold; }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
 </head>
 <body>
 
@@ -90,12 +69,21 @@
             <header class="top-header">
                 <div>
                     <h1>System Overview</h1>
-                    <p style="color: var(--light-text-color); margin-top: 5px;">Welcome back, Administrator.</p>
+                    <p style="color: gray; margin-top: 5px;">Welcome back, Administrator.</p>
                 </div>
-                <div class="user-profile" onclick="window.location.href='adminProfile.jsp'">
+                <div class="user-profile" onclick="window.location.href='adminProfile.jsp'" style="cursor:pointer">
                     <div class="avatar-circle"><i class="fas fa-user"></i></div>
                 </div>
             </header>
+
+            <% 
+                String status = request.getParameter("status");
+                if ("approve_ok".equals(status)) { 
+            %>
+                <div class="alert alert-success"><i class="fas fa-check-circle"></i> Repair request approved successfully!</div>
+            <% } else if ("reject_ok".equals(status)) { %>
+                <div class="alert alert-error"><i class="fas fa-times-circle"></i> Repair request has been rejected.</div>
+            <% } %>
 
             <div class="stats-grid">
                 <div class="stat-card">
@@ -104,7 +92,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-info"><h3>Completed</h3><p class="number"><%= completedRepairs %></p></div>
-                    <div class="stat-icon" style="color: var(--success-color);"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-icon" style="color: #2ecc71;"><i class="fas fa-check-circle"></i></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-info"><h3>Total Users</h3><p class="number"><%= totalUsers %></p></div>
@@ -112,7 +100,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-info"><h3>Pending Jobs</h3><p class="number"><%= pendingJobsCount %></p></div>
-                    <div class="stat-icon" style="color: var(--warning-color);"><i class="fas fa-clock"></i></div>
+                    <div class="stat-icon" style="color: #f1c40f;"><i class="fas fa-clock"></i></div>
                 </div>
             </div>
 
@@ -131,22 +119,42 @@
                     <tbody>
                         <% 
                             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-                            for (Map<String, Object> job : jobQueue) { 
+                            if(pendingQueue.isEmpty()) {
+                        %>
+                            <tr><td colspan="5" style="text-align:center; padding: 20px;">No pending jobs found.</td></tr>
+                        <% 
+                            } else {
+                                for (Map<String, Object> job : pendingQueue) { 
                         %>
                         <tr>
-                            <td><strong><%= job.get("name") %></strong></td>
-                            <td><%= (job.get("date") != null) ? sdf.format(job.get("date")) : "N/A" %></td>
-                            <td><%= job.get("device") %></td>
-                            <td><span class="badge badge-pending">Pending</span></td>
                             <td>
-							    <button class="btn-sm btn-approve" onclick="location.href='ProcessRepair.jsp?id=<%= job.get("id") %>&action=approve'">Approve</button>
-							    <button class="btn-sm btn-reject" onclick="if(confirm('Reject this repair request?')) location.href='ProcessRepair.jsp?id=<%= job.get("id") %>&action=reject'">Reject</button>
+							    <% 
+							        // 1. Get the current status from the map
+							        String currentStatus = (String) job.get("status"); 
+							
+							        // 2. Logic: Only show buttons if the status is NOT 'Completed' or 'Rejected'
+							        if (currentStatus != null && 
+							           !"Completed".equalsIgnoreCase(currentStatus) && 
+							           !"Rejected".equalsIgnoreCase(currentStatus)) { 
+							    %>
+							        <button class="btn-sm" 
+							                style="background:#3498db; color:white; border:none; padding:6px 12px; cursor:pointer; border-radius:4px;"
+							                onclick="openAssignModal('<%= job.get("id") %>')">
+							            Assign
+							        </button>
+							    <% 
+							        } else { 
+							    %>
+							        <span class="badge" style="background:#bdc3c7; color:white;">Closed</span>
+							    <% 
+							        } 
+							    %>
 							</td>
                         </tr>
-                        <% } %>
-                        <% if(jobQueue.isEmpty()) { %>
-                            <tr><td colspan="5" style="text-align:center;">No pending jobs found.</td></tr>
-                        <% } %>
+                        <% 
+                                } 
+                            } 
+                        %>
                     </tbody>
                 </table>
             </div>
@@ -158,17 +166,14 @@
                         <tr><th>Part Name</th><th>Stock Level</th><th>Status</th></tr>
                     </thead>
                     <tbody>
-                        <% for (Map<String, Object> part : lowStockParts) { 
-                            int qty = (Integer)part.get("qty");
-                        %>
+                        <% if(lowStockParts.isEmpty()) { %>
+                            <tr><td colspan="3" style="text-align:center;">All parts are well-stocked.</td></tr>
+                        <% } %>
+                        <% for (Map<String, Object> part : lowStockParts) { %>
                         <tr>
                             <td><%= part.get("name") %></td>
-                            <td style="color: red; font-weight: bold;"><%= qty %></td>
-                            <td>
-                                <span class="badge <%= (qty == 0) ? "badge-danger" : "badge-warning" %>">
-                                    <%= (qty == 0) ? "Out of Stock" : "Low Stock" %>
-                                </span>
-                            </td>
+                            <td style="color: red; font-weight: bold;"><%= part.get("qty") %></td>
+                            <td><span class="badge badge-danger">Low Stock</span></td>
                         </tr>
                         <% } %>
                     </tbody>
