@@ -10,6 +10,7 @@ import="techModel.partTrack"%>
     <title>Lappo Technician - Inventory</title>
     <link rel="stylesheet" href="CSS/AllTechnicianCSS.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <jsp:useBean id="repairDao" class="techModel.partTrack" scope="page" />
     
     <%
     // Fetch part list from the database to populate dropdown
@@ -148,55 +149,6 @@ import="techModel.partTrack"%>
         
     %>
 
-                    
-                    
-                    <!--  
-                        <!-- Row 1 
-                        <tr>
-                            <td><strong>Lenovo LOQ Screen</strong></td>
-                            <td style="color: var(--light-text-color);">LENOVO-092</td>
-                            <td>Screen</td>
-                            <td><span class="badge badge-warning">Low Stock</span></td>
-                            <td>RM400.00</td>
-                            <td><span class="badge badge-warning">Pending</span></td>
-                        </tr>
-                        <!-- Row 2 
-                        <tr>
-                            <td><strong>Dell XPS Battery 52Wh</strong></td>
-                            <td style="color: var(--light-text-color);">BAT-DEL-XPS-052</td>
-                            <td>Battery</td>
-                            <td><span class="badge badge-danger">Out of Stock</span></td>
-                            <td>RM85.00</td>
-                            <td><span class="badge badge-warning">Pending</span></td>
-                        </tr>
-                        <!-- Row 3 
-                        <tr>
-                            <td><strong>Samsung 512GB NVMe SSD</strong></td>
-                            <td style="color: var(--light-text-color);">SSD-SAM-512-NV</td>
-                            <td>Storage</td>
-                            <td><span class="badge badge-success">In Stock</span></td>
-                            <td>RM65.00</td>
-                            <td><span class="badge badge-success">Approved</span></td>
-                        </tr>
-                        <!-- Row 4 
-                        <tr>
-                            <td><strong>Thermal Paste (Arctic MX-4)</strong></td>
-                            <td style="color: var(--light-text-color);">ACC-ARC-MX4-004</td>
-                            <td>Consumable</td>
-                            <td><span class="badge badge-success">In Stock</span></td>
-                            <td>RM8.50</td>
-                            <td><span class="badge badge-success">Approved</span></td>
-                        </tr>
-                        <!-- Row 5 
-                        <tr>
-                            <td><strong>HP Pavilion Keyboard (US)</strong></td>
-                            <td style="color: var(--light-text-color);">KBD-HP-PAV-US</td>
-                            <td>Keyboard</td>
-                            <td><span class="badge badge-success">In Stock</span></td>
-                            <td>RM35.00</td>
-                            <td><span class="badge badge-success">Approved</span></td>
-                        </tr>
-                         -->
                     </tbody>
                 </table>
             </div>
@@ -215,8 +167,8 @@ import="techModel.partTrack"%>
                 <div class="form-group">
                 
 					 <label>Repair Identification Number</label>
-					 <select name="repairID" id="rID" required>
-					     <%
+						 <select name="repairID" id="rID" required>
+	  <%
      		   List<partTrack> repairList =
             (List<partTrack>) session.getAttribute("repairIDs");
 
@@ -230,6 +182,7 @@ import="techModel.partTrack"%>
             	}
         		}
     			%>
+
     		</select>
 					 
 

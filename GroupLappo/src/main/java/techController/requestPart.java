@@ -47,6 +47,10 @@ public class requestPart extends HttpServlet {
 		
 		int technicianIds = (int) session.getAttribute("userID");
 		
+		List<partTrack> repairIDs = new ArrayList<>();
+		
+
+		
 		reqPartDAO dao2 = new reqPartDAO();
 		
 		reqPartDAO dao = new reqPartDAO();
@@ -95,7 +99,19 @@ public class requestPart extends HttpServlet {
            ps.setInt(1, technicianId);
            ResultSet rs = ps.executeQuery();
            
+           ResultSet sp = stmt.executeQuery();
+           while(sp.next()) {
+           	partTrack pt = new partTrack(
+           			sp.getInt("RepairID")
+           			);
+           	
+           	repairIDs.add(pt);   
            
+           }
+           
+           session.setAttribute("repairIDs", repairIDs);
+   		
+           System.out.println("Repair IDs sent to JSP: " + repairIDs);
 
             // Display results in HTML table
           
@@ -132,7 +148,7 @@ public class requestPart extends HttpServlet {
             }
         request.getRequestDispatcher("technicianRequest.jsp").forward(request, response);
         
-        
+     
     }
       
 		
