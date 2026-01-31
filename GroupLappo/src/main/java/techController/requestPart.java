@@ -47,7 +47,7 @@ public class requestPart extends HttpServlet {
 		
 		int technicianIds = (int) session.getAttribute("userID");
 		
-		List<partTrack> repairIDs = new ArrayList<>();
+		List<partTrack> repairList = new ArrayList<>();
 		
 
 		
@@ -90,7 +90,12 @@ public class requestPart extends HttpServlet {
     	             "JOIN repair r ON pr.RepairID = r.RepairID " +
     	             "WHERE pr.RequestedBy = ?";
     		
-            String repairSql = "SELECT DISTINCT repairID FROM repair WHERE assignedTech = ?";
+    		String repairSql = "SELECT RepairID, CurrentStatus, DateIssued, LaptopModel, repairDesc " +
+                    "FROM repair " +
+                    "WHERE AssignedTech = ? " +
+                    "AND CurrentStatus NOT IN ('Complete', 'Collected', 'Cancelled') " +
+                    "ORDER BY DateIssued DESC";
+    		
             PreparedStatement stmt = con.prepareStatement(repairSql);
             stmt.setInt(1, technicianIds);
 
@@ -99,19 +104,24 @@ public class requestPart extends HttpServlet {
            ps.setInt(1, technicianId);
            ResultSet rs = ps.executeQuery();
            
+           
+           
            ResultSet sp = stmt.executeQuery();
            while(sp.next()) {
-           	partTrack pt = new partTrack(
-           			sp.getInt("RepairID")
-           			);
-           	
-           	repairIDs.add(pt);   
+           	partTrack pt = new partTrack();
+           			pt.setRepairID(sp.getInt("RepairID"));
+           			pt.setStatus(sp.getString("CurrentStatus"));
+                    pt.setDate(sp.getString("DateIssued")); 
+                    pt.setModel(sp.getString("LaptopModel"));
+                    pt.setProblem(sp.getString("repairDesc"));
+                    
+
+           	repairList.add(pt);   
            
            }
            
-           session.setAttribute("repairIDs", repairIDs);
+           session.setAttribute("repairList", repairList);
    		
-           System.out.println("Repair IDs sent to JSP: " + repairIDs);
 
             // Display results in HTML table
           

@@ -101,7 +101,7 @@ import="techModel.partTrack"%>
             <div class="inventory-toolbar">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search by Part Name, ID, or Category...">
+                    <input type="text" id="searchInput" placeholder="Search by Part Name, ID, or Category...">
                 </div>
                 <button class="btn-add" id="openModalBtn">
                     <i class="fas fa-plus"></i> Request New Part
@@ -122,7 +122,7 @@ import="techModel.partTrack"%>
                             <th>Approval Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="partsTableBody">
               <%
             // 1. Manually retrieve the list from the request
            List<reqPart> reqList = (List<reqPart>) session.getAttribute("reqsPart");
@@ -168,25 +168,27 @@ import="techModel.partTrack"%>
                 
 					 <label>Repair Identification Number</label>
 						 <select name="repairID" id="rID" required>
+						 <option value="">-- Select Repair Job --</option>
 	  <%
      		   List<partTrack> repairList =
-            (List<partTrack>) session.getAttribute("repairIDs");
+            (List<partTrack>) session.getAttribute("repairList");
 
       	  if (repairList != null && !repairList.isEmpty()) {
             for (partTrack pt : repairList) {
     		%>
                 <option value="<%= pt.getRepairID() %>">
-                    Repair <%= pt.getRepairID() %>
+                    <%= pt.getRepairID() %> -
+  					<%= pt.getStatus() %> -
+  					<%= pt.getDate() %> -
+  					<%= pt.getModel() %> -
+ 					<%= pt.getProblem() %> 
                 </option>
    	 			<%
             	}
         		}
     			%>
-
     		</select>
 					 
-
-    
                     <label>Part Name</label>
                     <select name ="partID" id="pID" required>
                     <% while(rs.next()){ %>
@@ -283,6 +285,39 @@ import="techModel.partTrack"%>
                 });
             }
         });
+        
+        //For searching 
+         const searchInput = document.getElementById("searchInput");
+  		const tbody = document.getElementById("partsTableBody");
+
+ 		 function filterTable() {
+    	const keyword = searchInput.value.toLowerCase().trim();
+    	const rows = tbody.querySelectorAll("tr");
+
+    	 let visibleCount = 0;
+
+    	rows.forEach(row => {
+	      const text = row.innerText.toLowerCase();
+	      const match = text.includes(keyword);
+     	 row.style.display = match ? "" : "none";
+      	if (match) visibleCount++;
+    	});
+
+    	// Optional: show "no results" row
+    	const existingNoRow = document.getElementById("noResultsRow");
+    	if (existingNoRow) existingNoRow.remove();
+
+    	if (visibleCount === 0 && rows.length > 0) {
+     	 const noRow = document.createElement("tr");
+     	 noRow.id = "noResultsRow";
+     	 noRow.innerHTML = `<td class="no-results" colspan="7">No matching records found.</td>`;
+     	 tbody.appendChild(noRow);
+   	 }
+  	}
+
+  	if (searchInput && tbody) {
+    	searchInput.addEventListener("input", filterTable);
+  }	
         
     </script>
 
