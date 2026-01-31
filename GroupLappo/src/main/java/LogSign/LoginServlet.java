@@ -68,7 +68,7 @@ public class LoginServlet extends HttpServlet {
 
                 // 🔥 ADMIN OVERRIDE (AUTO)
                 if ("Admin".equalsIgnoreCase(userType)) {
-                    response.sendRedirect("admin_dashboard.jsp");
+                    response.sendRedirect("dashboardController");
                     return;
                 }
 

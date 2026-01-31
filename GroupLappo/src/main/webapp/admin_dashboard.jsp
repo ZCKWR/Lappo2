@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="adminDAO.repairDAO, adminDAO.userDAO, java.util.*, java.text.SimpleDateFormat" %>
+<%@ page import="adminDAO.repairDAO, adminDAO.userDAO, adminModel.lowStock,  java.util.*, java.text.SimpleDateFormat" %>
 
 <%
     // 1. Session & Security Check
@@ -24,7 +24,7 @@
     for(Map<String, Object> r : allRepairs) {
         String status = (String)r.get("status");
         if("In Progress".equals(status)) activeRepairs++;
-        if("Completed".equals(status)) completedRepairs++;
+        if("Complete".equals(status)) completedRepairs++;
         if("Pending".equals(status)) {
             pendingJobsCount++;
             pendingQueue.add(r); // Add to dashboard queue
@@ -57,7 +57,7 @@
         <nav class="sidebar">
             <div class="sidebar-header"><i class="fas fa-laptop"></i> <span>Lappo Admin</span></div>
             <div class="sidebar-nav">
-                <a href="admin_dashboard.jsp" class="active"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+                <a href="dashboardController" class="active"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
                 <a href="admin_active_repair.jsp"><i class="fas fa-wrench"></i> <span>Repairs</span></a>
                 <a href="admin_inventory.jsp"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
                 <a href="admin_users.jsp"><i class="fas fa-users"></i> <span>Users</span></a>
@@ -87,19 +87,19 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Active Repairs</h3><p class="number"><%= activeRepairs %></p></div>
+                    <div class="stat-info"><h3>Active Repairs</h3><p class="number"><%= request.getAttribute("countTotalActiveJob") %></p></div>
                     <div class="stat-icon"><i class="fas fa-tools"></i></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Completed</h3><p class="number"><%= completedRepairs %></p></div>
+                    <div class="stat-info"><h3>Completed</h3><p class="number"><%= request.getAttribute("countTotalCompleteJob") %></p></div>
                     <div class="stat-icon" style="color: #2ecc71;"><i class="fas fa-check-circle"></i></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Total Users</h3><p class="number"><%= totalUsers %></p></div>
+                    <div class="stat-info"><h3>Total Users</h3><p class="number"><%= request.getAttribute("totalUser") %></p></div>
                     <div class="stat-icon" style="color: purple;"><i class="fas fa-user"></i></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Pending Jobs</h3><p class="number"><%= pendingJobsCount %></p></div>
+                    <div class="stat-info"><h3>Pending Jobs</h3><p class="number"><%= request.getAttribute("countTotalPendingJob") %></p></div>
                     <div class="stat-icon" style="color: #f1c40f;"><i class="fas fa-clock"></i></div>
                 </div>
             </div>
@@ -163,19 +163,29 @@
                 <div class="panel-header"><h2>Low Stock Alerts</h2></div>
                 <table class="data-table">
                     <thead>
-                        <tr><th>Part Name</th><th>Stock Level</th><th>Status</th></tr>
+                        <tr><th>Part ID</th><th>Part Name</th><th>Quantity</th></tr>
                     </thead>
                     <tbody>
-                        <% if(lowStockParts.isEmpty()) { %>
+                    <% 
+                    List<lowStock> list = (List<lowStock>) session.getAttribute("lowStock");
+            
+            // 2. Check if the list exists and loop through it
+            if (list != null && !list.isEmpty()) {
+                for (lowStock s : list) {
+                    %>
+                
+                        <% if(list.isEmpty()) { %>
                             <tr><td colspan="3" style="text-align:center;">All parts are well-stocked.</td></tr>
                         <% } %>
-                        <% for (Map<String, Object> part : lowStockParts) { %>
+     
                         <tr>
-                            <td><%= part.get("name") %></td>
-                            <td style="color: red; font-weight: bold;"><%= part.get("qty") %></td>
-                            <td><span class="badge badge-danger">Low Stock</span></td>
+                            <td><%= s.getRepairID() %></td>
+                            <td style="color: red; font-weight: bold;"><%= s.getPartName() %></td>
+                            <td><%= s.getQuantity() %></td>
                         </tr>
-                        <% } %>
+                        <% }
+           				   }	
+                		%>
                     </tbody>
                 </table>
             </div>
