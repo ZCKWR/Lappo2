@@ -10,9 +10,9 @@ import java.sql.*;
 
 @WebServlet("/InventoryController")
 public class InventoryController extends HttpServlet {
-    private String dbURL = "jdbc:mysql://localhost:3306/lappo";
+    private String dbURL = "jdbc:mysql://localhost:3306/lappo2";
     private String dbUser = "root";
-    private String dbPass = "12345";
+    private String dbPass = "Zack1234!";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");

@@ -12,16 +12,52 @@ import util.DBConnection;
 
 public class RepairDAO {
 
-    public List<Repair> getOngoingRepairs() {
+    public List<Repair> getOngoingRepairs(int studentID) {
 
         List<Repair> repairs = new ArrayList<>();
 
-        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair";
+        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair where CustomerID = ? AND CurrentStatus NOT IN ('Complete', 'Collected', 'Cancelled')";
 
         try {
             Connection conn = DBConnection.getConnection();
             System.out.println("DB Connection = " + conn);
             PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentID);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Repair repair = new Repair();
+                repair.setRepairID(rs.getInt("RepairID"));
+                repair.setDateIssued(rs.getString("DateIssued"));
+                repair.setLaptopModel(rs.getString("LaptopModel"));
+                repair.setIssue(rs.getString("Issue"));
+                repair.setCurrentStatus(rs.getString("CurrentStatus"));
+
+                repairs.add(repair);
+            }
+
+            rs.close();
+            ps.close();
+            conn.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return repairs;
+    }
+    
+    public List<Repair> getPastRepairs(int studentID) {
+
+        List<Repair> repairs = new ArrayList<>();
+
+        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair where CustomerID = ? AND CurrentStatus IN ('Complete', 'Collected', 'Cancelled')";
+
+        try {
+            Connection conn = DBConnection.getConnection();
+            System.out.println("DB Connection = " + conn);
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentID);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -69,41 +105,6 @@ public class RepairDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    public List<Repair> getPastRepairs() {
-
-        List<Repair> repairs = new ArrayList<>();
-
-        String sql =
-            "SELECT LaptopModel, Issue, DateIssued, CurrentStatus " +
-            "FROM REPAIR " +
-            "WHERE CurrentStatus = 'Completed'";
-
-        try {
-            Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Repair repair = new Repair();
-                repair.setLaptopModel(rs.getString("LaptopModel"));
-                repair.setIssue(rs.getString("Issue"));
-                repair.setDateIssued(rs.getString("DateIssued"));
-                repair.setCurrentStatus(rs.getString("CurrentStatus"));
-
-                repairs.add(repair);
-            }
-
-            rs.close();
-            ps.close();
-            conn.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return repairs;
     }
     
     public List<Repair> getRepairStatus() {
@@ -223,11 +224,14 @@ public class RepairDAO {
         return 0;
     }
     
-    public int countAllRepairs() {
-        String sql = "SELECT COUNT(*) FROM REPAIR";
-        try (Connection conn = DBConnection.getConnection();
+    public int countAllRepairs(int studentID) {
+        String sql = "SELECT COUNT(*) FROM REPAIR Where CustomerID = ?";
+        try {
+        	 Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             ps.setInt(1, studentID);
+
+             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) return rs.getInt(1);
         } catch (Exception e) {

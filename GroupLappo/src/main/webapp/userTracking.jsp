@@ -1,4 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="userModel.Repair" %>
+<%@ page import="userDAO.RepairDAO" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,13 +23,13 @@
                 <i class="fas fa-laptop"></i> <span>Lappo Student</span>
             </div>
             <div class="sidebar-nav">
-                <a href="UserDashboard.jsp" >
+                <a href="ongoingRepairs" >
                     <i class="fas fa-th-large"></i> <span>Dashboard</span>
                 </a>
-               <a href="userTracking.jsp" class="active">
+               <a href="repairStatus" class="active">
                     <i class="fas fa-search-location"></i> <span>Track Repair</span>
                 </a>
-                <a href="userHistory.jsp">
+                <a href="pastInvoices">
                     <i class="fas fa-history"></i> <span>History</span>
                 </a>
                 <a href="userProfile.jsp">
@@ -41,17 +45,19 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            
-            <div class="track-search-container">
-                <h2>Track Your Repair Status</h2>
-                <p style="color: var(--light-text-color);">Enter your Device to check status.</p>
-                
-                <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="Lenovo..." >
-                    <button class="search-btn">Track</button>
-                </div>
-            </div>
-
+            	<div class="track-search-container">
+                	<h2>Track Your Repair Status</h2>
+                	<p style="color: var(--light-text-color);">Enter your Device to check status.</p>
+                	
+            		<form action="repairStatus" method="get">
+                		<div class="search-bar">
+                    		<input type="text" class="search-input" name="device" placeholder="Lenovo..." >
+                    		<button type="submit" class="search-btn">Track</button>
+                		</div>
+                	</form>
+                	
+            	</div>
+			
             <!-- Result Section -->
             <div class="tracking-result">
                 
@@ -72,31 +78,60 @@
                             </tr>
                         </thead>
                         <tbody>
+                           <%
+    							List<Repair> statusRepairList = (List<Repair>) request.getAttribute("repairList");
+
+    							if (statusRepairList != null) {
+        							for (Repair r : statusRepairList) {
+							%>
                             <tr>
-                                <td><strong>#REQ-2023-001</strong></td>
-                                <td>Oct 24, 2023</td>
-                                <td>MacBook Air M1</td>
-                                <td>Screen Glitch</td>
-                                <td>Zakwan</td>
-                                <td><span class="badge badge-progress">In Progress</span></td>
-                                <td>-</td>
+                                <td><%= r.getRepairID() %></td>
+    							<td><%= r.getDateIssued() %></td>
+    							<td><%= r.getLaptopModel() %></td>
+    							<td><%= r.getIssue() %></td>
+    							<td><%= r.getUsername() %></td>
+    							<td style="<%
+    								String status = r.getCurrentStatus();
+    								if ("Completed".equalsIgnoreCase(status)) {
+        								out.print("color: green; font-weight: bold;");
+    								} else if ("Payment Pending".equalsIgnoreCase(status)) {
+        								out.print("color: orange; font-weight: bold;");
+    								} else {
+        								out.print("color: black;");
+    								}
+								%>">
+    								<%= status %>
+								</td>
+
+
+                                <td >
+								<%
+    								//String status = r.getCurrentStatus();
+
+    								if ("Payment Pending".equalsIgnoreCase(status)) {
+								%>
+        								<button onclick="openPayment(<%= r.getRepairID() %>, <%= new userDAO.RepairDAO().getPaymentAmountByRepairID(r.getRepairID())  %>)">
+            								Pay Now
+        								</button>
+								<%
+    								} else if ("Completed".equalsIgnoreCase(status)) {
+								%>
+        								<button onclick="openInvoice(<%= r.getRepairID() %>)">
+            								View Invoice
+        								</button>
+								<%
+    								} else {
+								%>
+        								<button disabled>—</button>
+								<%
+    								}
+								%>
+								</td>
                             </tr>
-                            <tr>
-                                <td><strong>#REQ-2023-002</strong></td>
-                                <td>Oct 20, 2023</td>
-                                <td>Dell XPS 13</td>
-                                <td>Battery Replacement</td>
-                                <td>Amad</td>
-                               
-                                <td>
-                                <span class="badge badge-payment">Payment Pending</span>
-                                </td>
-                                <td>
-                                <button class="btn-pay-status" onclick="showPaymentModal('#REQ-2023-002', '150.00')">
-                                        <i class="fas fa-credit-card"></i> Pay Now
-                                    </button>
-                                </td>
-                            </tr>
+                            <%
+        							}
+    							}
+                            %>
                         </tbody>
                     </table>
                 </div>
@@ -176,6 +211,45 @@
             </form>
         </div>
     </div>
+    
+    <!-- Invoice Modal -->
+<div id="invoiceModal" class="modal">
+    <div class="modal-content" style="text-align: left;">
+        <span class="close-btn" onclick="closeModal('invoiceModal')">&times;</span>
+        
+        <div class="receipt-header" style="text-align: center;">
+            <i class="fas fa-file-invoice-dollar" 
+               style="color: var(--primary-color); font-size: 2.5em; margin-bottom: 10px;"></i>
+            <h2>Invoice</h2>
+            <p>Invoice for <span id="i_id" style="font-weight: bold;">#REQ-000</span></p>
+        </div>
+
+        <!-- Invoice Info (same spacing style as payment modal) -->
+        <div class="form-group">
+            <label>Device</label>
+            <input type="text" id="i_device" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Issue</label>
+            <input type="text" id="i_issue" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Payment Date</label>
+            <input type="text" id="i_date" readonly>
+        </div>
+
+        <div class="receipt-total" style="margin-bottom: 20px;">
+            <span>Total Paid</span>
+            <span style="color: var(--primary-color);" id="i_amount">RM 0.00</span>
+        </div>
+
+        <button class="btn-confirm-pay" onclick="closeModal('invoiceModal')">
+            Close
+        </button>
+    </div>
+</div>
 
     <script>
         // Modal Logic
@@ -188,9 +262,14 @@
         }
         
         // Payment Logic
-        function showPaymentModal(id, amount) {
-            document.getElementById('p_id').textContent = id;
-            document.getElementById('p_amount').textContent = 'RM ' + amount;
+        function openPayment(repairID, amount) {
+        	// Set the repair ID
+            document.getElementById('p_id').textContent = "#REQ-" + repairID;
+        	
+        	//Set the amount
+            document.getElementById('p_amount').textContent = "RM " + amount.toFixed(2);
+        	
+        	// Show the modal
             document.getElementById('paymentModal').style.display = 'flex';
         }
 
@@ -240,6 +319,39 @@
                 paymentModal.style.display = "none";
             }
         }
+        
+        function openInvoice(repairID) {
+            // These values are injected from JSP
+            const invoice = invoiceData[repairID];
+            if (!invoice) {
+                alert("Invoice not found");
+                return;
+            }
+
+            document.getElementById('i_id').textContent = "#REQ-" + repairID;
+            document.getElementById('i_device').value = invoice.device;
+            document.getElementById('i_issue').value = invoice.issue;
+            document.getElementById('i_date').value = invoice.date;
+            document.getElementById('i_amount').textContent = 
+                "RM " + parseFloat(invoice.amount).toFixed(2);
+
+            document.getElementById('invoiceModal').style.display = 'flex';
+        }
+        
+        const invoiceData = {
+                <% for (Repair r : statusRepairList) {
+                    if ("Completed".equalsIgnoreCase(r.getCurrentStatus())) {
+                %>
+                <%= r.getRepairID() %>: {
+                    device: "<%= r.getLaptopModel() %>",
+                    issue: "<%= r.getIssue() %>",
+                    amount: "<%= new userDAO.RepairDAO()
+                                .getPaymentAmountByRepairID(r.getRepairID()) %>",
+                    date: "<%= r.getDateIssued() %>"
+                },
+                <% }} %>
+            };
+        
     </script>
 
 </body>

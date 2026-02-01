@@ -170,7 +170,7 @@
                     </thead>
                     <tbody>
                         <%
-                        	List<Repair> pastRepairList = (List<Repair>) request.getAttribute("repairList");
+                        	List<Repair> pastRepairList = (List<Repair>) request.getAttribute("pastRepair");
                         
                         	if (pastRepairList != null){
                         		for (Repair r : pastRepairList) {
@@ -249,6 +249,7 @@
                 modal.style.display = "none";
             }
         }
+
     </script>
 
 </body>

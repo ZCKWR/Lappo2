@@ -74,7 +74,7 @@ public class LoginServlet extends HttpServlet {
 
                 // 👤 STUDENT / TECHNICIAN ikut radio
                 if ("student".equals(role) && "Student".equalsIgnoreCase(userType)) {
-                    response.sendRedirect("UserDashboard.jsp");
+                    response.sendRedirect("ongoingRepairs");
                     return;
                 } 
                 else if ("technician".equals(role) && "Technician".equalsIgnoreCase(userType)) {

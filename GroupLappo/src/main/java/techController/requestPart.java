@@ -179,21 +179,7 @@ public class requestPart extends HttpServlet {
 		HttpSession session = request.getSession();
 		Integer technicianId = (Integer) session.getAttribute("userID");
 		
-		
-
-		
-		
-		
-		/**
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		
-	    System.out.println("HALLO");
-
-	    System.out.println("repairId = " + request.getParameter("RepairID"));
-	    System.out.println("status = " + request.getParameter("currentStatus"));
-	    System.out.println("remarks = " + request.getParameter("remarks"));
-		**/
+	
 		
 		String repairID = request.getParameter("repairID");
 		String partID = request.getParameter("partID");
