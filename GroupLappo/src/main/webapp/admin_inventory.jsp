@@ -30,7 +30,7 @@
         totalItems += qty;
         totalInventoryValue += (qty * cost);
         if(qty == 0) outOfStockCount++;
-        else if(qty <= 5) lowStockCount++;
+        else if(qty < 10) lowStockCount++;
     }
 %>
 
@@ -69,7 +69,7 @@
         <nav class="sidebar">
             <div class="sidebar-header"><i class="fas fa-laptop"></i> <span>Lappo Admin</span></div>
             <div class="sidebar-nav">
-                <a href="admin_dashboard.jsp"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+                <a href="dashboardController"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
                 <a href="admin_active_repair.jsp"><i class="fas fa-wrench"></i> <span>Repairs</span></a>
                 <a href="admin_inventory.jsp" class="active"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
                 <a href="admin_users.jsp"><i class="fas fa-users"></i> <span>Users</span></a>
@@ -116,7 +116,7 @@
                         <tbody>
                             <% for(Map<String, Object> item : inventoryList) { 
                                 int qty = (int)item.get("qty");
-                                String statusClass = (qty == 0) ? "badge-danger" : (qty <= 5) ? "badge-warning" : "badge-success";
+                                String statusClass = (qty == 0) ? "badge-danger" : (qty < 10) ? "badge-warning" : "badge-success";
                             %>
                             <tr class="inv-row">
                                 <td><strong><%= item.get("name") %></strong></td>
@@ -124,7 +124,7 @@
                                 <td><%= item.get("brand") %></td>
                                 <td style="font-weight: bold; <%= qty == 0 ? "color: red;" : "" %>"><%= qty %></td>
                                 <td>RM <%= String.format("%.2f", (double)item.get("cost")) %></td>
-                                <td><span class="badge <%= statusClass %>"><%= (qty == 0) ? "Out of Stock" : (qty <= 5) ? "Low Stock" : "In Stock" %></span></td>
+                                <td><span class="badge <%= statusClass %>"><%= (qty == 0) ? "Out of Stock" : (qty < 10) ? "Low Stock" : "In Stock" %></span></td>
                                 <td>
                                     <button class="btn-sm" style="background:#3498db; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:4px;" onclick="openRestockModal('<%= item.get("id") %>', '<%= item.get("name") %>')">Restock</button>
                                     <button class="btn-sm" style="background:#f39c12; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:4px;" onclick="openEditModal('<%= item.get("id") %>', '<%= item.get("name") %>', '<%= item.get("brand") %>', '<%= qty %>', '<%= item.get("cost") %>')">Edit</button>
@@ -156,7 +156,7 @@
                             ResultSet rsReq = null;
                             try {
                                 Class.forName("com.mysql.jdbc.Driver");
-                                conReq = DriverManager.getConnection("jdbc:mysql://localhost:3306/lappo", "root", "12345");
+                                conReq = DriverManager.getConnection("jdbc:mysql://localhost:3306/lappo2", "root", "Zack1234!");
                                 
                                 String sqlReq = "SELECT pr.*, p.PartName, u.Username AS Requester, adm.Username AS Approver " +
                                              "FROM partrequest pr " +

@@ -111,7 +111,7 @@
                             <td><span class="badge badge-<%= status.toLowerCase().replace(" ", "") %>"><%= status %></span></td>
                             <td><%= displayPrice %></td>
                             <td>
-                                <% if(!status.equalsIgnoreCase("Completed")) { %>
+                                <% if(!status.equalsIgnoreCase("Complete")) { %>
                                     <button class="btn-sm" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openAssignModal('<%= r.get("id") %>')">
                                         <%= techName.equals("Unassigned") ? "Assign" : "Change Tech" %>
                                     </button>

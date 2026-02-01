@@ -1,4 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="userModel.Repair" %>
+<%@ page import="userModel.User" %>
+<%@ page import="userDAO.RepairDAO" %>
+
+<%
+    RepairDAO repairDAO = new RepairDAO();
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,13 +33,13 @@
             </div>
             
             <div class="sidebar-nav">
-                <a href="#" class="active">
+                <a href="ongoingRepairs">
                     <i class="fas fa-th-large"></i> <span>Dashboard</span>
                 </a>
-               <a href="userTracking.jsp">
+               <a href="repairStatus">
                     <i class="fas fa-search-location"></i> <span>Track Repair</span>
                 </a>
-                <a href="userHistory.jsp">
+                <a href="pastInvoices">
                     <i class="fas fa-history"></i> <span>History</span>
                 </a>
                 <a href="userProfile.jsp">
@@ -68,7 +77,7 @@
                 <div class="stat-card">
                     <div class="stat-info">
                         <h3>Active Repairs</h3>
-                        <p class="number">1</p>
+                        <p class="number"><%= request.getAttribute("activeRepairs") %></p>
                     </div>
                     <div class="stat-icon icon-blue">
                         <i class="fas fa-tools"></i>
@@ -79,7 +88,7 @@
                 <div class="stat-card">
                     <div class="stat-info">
                         <h3>Total History</h3>
-                        <p class="number">3</p>
+                        <p class="number"><%= request.getAttribute("totalRepairs") %></p>
                     </div>
                     <div class="stat-icon icon-teal">
                         <i class="fas fa-clipboard-check"></i>
@@ -90,7 +99,7 @@
                 <div class="stat-card">
                     <div class="stat-info">
                         <h3>Amount Due</h3>
-                        <p class="number">RM 0.00</p>
+                        <p class="number">RM <%= String.format("%.2f", request.getAttribute("amountDue")) %></p>
                     </div>
                     <div class="stat-icon icon-orange">
                         <i class="fas fa-wallet"></i>
@@ -111,6 +120,7 @@
                     <h2>Ongoing Repairs</h2>
                     <span class="badge badge-progress">1 Active</span>
                 </div>
+                
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -123,15 +133,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><strong>#REQ-2023-001</strong></td>
-                            <td>Oct 24, 2023</td>
-                            <td>MacBook Air M1</td>
-                            <td>Screen Display Glitch</td>
-                            <td><span class="badge badge-progress">In Progress</span></td>
-                           
-                        </tr>
-                    </tbody>
+            			<%
+               				// Get the list from the request
+                			List<Repair> repairList = (List<Repair>) request.getAttribute("repairList");
+                			if (repairList != null) {
+                    			for (Repair repair : repairList) {
+            			%>
+                			<tr>
+                    			<td><%= repair.getRepairID() %></td>
+                    			<td><%= repair.getDateIssued() %></td>
+                    			<td><%= repair.getLaptopModel() %></td>
+                    			<td><%= repair.getIssue() %></td>
+                    			<td><%= repair.getCurrentStatus() %></td>
+                			</tr>
+            			<%
+                    			}
+                			}
+            			%>
+        			</tbody>
                 </table>
             </div>
 
@@ -150,18 +169,22 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <%
+                        	List<Repair> pastRepairList = (List<Repair>) request.getAttribute("repairList");
+                        
+                        	if (pastRepairList != null){
+                        		for (Repair r : pastRepairList) {
+                        %>
                         <tr>
-                            <td>Dell XPS 13</td>
-                            <td>Battery Replacement</td>
-                            <td>Sep 15, 2023</td>
-                            <td><span class="badge badge-completed">Completed</span></td>
+                        	<td><%= r.getLaptopModel() %></td>
+    						<td><%= r.getIssue() %></td>
+    						<td><%= r.getDateIssued() %></td>
+    						<td><%= r.getCurrentStatus() %></td>
                         </tr>
-                        <tr>
-                            <td>iPhone 11</td>
-                            <td>Water Damage</td>
-                            <td>Aug 02, 2023</td>
-                            <td><span class="badge badge-completed">Completed</span></td>
-                        </tr>
+                        <%			
+                        		}
+                        	}
+                        %>
                     </tbody>
                 </table>
             </div>
@@ -174,14 +197,14 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeBookingModal()">&times;</span>
             <h2 style="margin-top: 0; color: var(--text-color); margin-bottom: 20px;">Schedule Repair</h2>
-            <form action="BookRepairServlet" method="post">
+            <form action="submitRepair" method="post">
                 <div class="form-group">
                     <label>Device Model</label>
-                    <input type="text" name="device" placeholder="e.g. MacBook Pro 2021" required>
+                    <input type="text" name="laptopModel" placeholder="e.g. MacBook Pro 2021" required>
                 </div>
                 <div class="form-group">
                     <label>Issue Type</label>
-                    <select name="issueType">
+                    <select name="issue">
                         <option>Screen Damage</option>
                         <option>Battery Issue</option>
                         <option>Water Damage</option>
@@ -195,7 +218,7 @@
                 </div>
                 <div class="form-group">
                     <label>Preferred Date</label>
-                    <input type="date" name="date" required>
+                    <input type="date" name="dateIssued" required>
                 </div>
                 <button type="submit" class="btn-submit">Confirm Booking</button>
             </form>

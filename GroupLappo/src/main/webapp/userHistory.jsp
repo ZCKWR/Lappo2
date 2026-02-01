@@ -1,4 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="userModel.Invoice" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,13 +22,13 @@
                 <i class="fas fa-laptop"></i> <span>Lappo Student</span>
             </div>
             <div class="sidebar-nav">
-                <a href="UserDashboard.jsp" >
+                <a href="ongoingRepairs" >
                     <i class="fas fa-th-large"></i> <span>Dashboard</span>
                 </a>
-               <a href="userTracking.jsp">
+               <a href="repairStatus">
                     <i class="fas fa-search-location"></i> <span>Track Repair</span>
                 </a>
-                <a href="userHistory.jsp" class="active">
+                <a href="pastInvoices" class="active">
                     <i class="fas fa-history"></i> <span>History</span>
                 </a>
                 <a href="userProfile.jsp">
@@ -33,7 +36,7 @@
                 </a>
             </div>
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='index.html'">
+                <button class="btn-logout" onclick="window.location.href='Index.html'">
                     <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
                 </button>
             </div>
@@ -66,38 +69,30 @@
                             <th>Device</th>
                             <th>Issue</th>
                             <th>Total Cost</th>
-                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                    	<%
+    						List<Invoice> invoiceList = (List<Invoice>) request.getAttribute("invoiceList");
+
+    						if (invoiceList != null) {
+        					for (Invoice inv : invoiceList) {
+						%>
                         <tr>
-                            <td><strong>#REQ-2023-002</strong></td>
-                            <td>Oct 20, 2023</td>
-                            <td>Dell XPS 13</td>
-                            <td>Battery Replacement</td>
-                            <td>RM 150.00</td>
-                            <td><span class="badge badge-completed">Completed</span></td>
-                            <td><button class="btn-sm" onclick="showReceipt('#REQ-2023-002', 'Dell XPS 13', 'Battery Replacement', '150.00', 'Oct 20, 2023')">View Receipt</button></td>
+                            <td><%= inv.getInvoiceID() %></td>
+    						<td><%= inv.getPaymentDate() %></td>
+    						<td><%= inv.getLaptopModel() %></td>
+    						<td><%= inv.getIssue() %></td>
+    						<td>RM <%= String.format("%.2f", inv.getPaymentAmount()) %></td>
+                            <td>
+        						<a href="#">View</a>
+    						</td>
                         </tr>
-                        <tr>
-                            <td><strong>#REQ-2023-003</strong></td>
-                            <td>Sep 15, 2023</td>
-                            <td>iPhone 11</td>
-                            <td>Water Damage Repair</td>
-                            <td>RM 250.00</td>
-                            <td><span class="badge badge-completed">Completed</span></td>
-                            <td><button class="btn-sm" onclick="showReceipt('#REQ-2023-003', 'iPhone 11', 'Water Damage Repair', '250.00', 'Sep 15, 2023')">View Receipt</button></td>
-                        </tr>
-                        <tr>
-                            <td><strong>#REQ-2023-004</strong></td>
-                            <td>Aug 05, 2023</td>
-                            <td>HP Pavilion</td>
-                            <td>Keyboard Replacement</td>
-                            <td>RM 0.00</td>
-                            <td><span class="badge badge-cancelled">Cancelled</span></td>
-                            <td><button class="btn-sm">Details</button></td>
-                        </tr>
+                        <%
+        						}
+    						}
+						%>
                     </tbody>
                 </table>
             </div>

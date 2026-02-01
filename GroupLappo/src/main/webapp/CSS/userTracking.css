@@ -316,3 +316,8 @@
             /* Table responsiveness */
             .data-table { display: block; overflow-x: auto; white-space: nowrap; }
         }
+        
+        .status-completed { color: green; font-weight: bold; }
+		.status-pending { color: orange; font-weight: bold; }
+		.status-other { color: black; }
+        

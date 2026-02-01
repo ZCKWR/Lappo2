@@ -19,13 +19,13 @@
                 <i class="fas fa-laptop"></i> <span>Lappo Student</span>
             </div>
             <div class="sidebar-nav">
-               <a href="UserDashboard.jsp" >
+               <a href="ongoingRepairs" >
                     <i class="fas fa-th-large"></i> <span>Dashboard</span>
                 </a>
-               <a href="userTracking.jsp" >
+               <a href="repairStatus" >
                     <i class="fas fa-search-location"></i> <span>Track Repair</span>
                 </a>
-                <a href="userHistory.jsp">
+                <a href="pastInvoices">
                     <i class="fas fa-history"></i> <span>History</span>
                 </a>
                 <a href="userProfile.jsp" class="active">
