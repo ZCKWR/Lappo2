@@ -1,14 +1,23 @@
 package userModel;
 
-public class User {
+public class Student {
 	
 	public int UserID;
 	public String Username;
 	public String UserEmail;
-	public String UserPassword;
 	public String UserAddress;
 	public String UserPhoneNumber;
-	public String UserType;
+	
+	public Student() {}
+	
+	public Student(int userID, String username, String userEmail, String userAddress, String userPhoneNumber) {
+		super();
+		UserID = userID;
+		Username = username;
+		UserEmail = userEmail;
+		UserAddress = userAddress;
+		UserPhoneNumber = userPhoneNumber;
+	}
 	
 	public int getUserID() {
 		return UserID;
@@ -19,17 +28,12 @@ public class User {
 	public String getUserEmail() {
 		return UserEmail;
 	}
-	public String getUserPassword() {
-		return UserPassword;
-	}
+	
 	public String getUserAddress() {
 		return UserAddress;
 	}
 	public String getUserPhoneNumber() {
 		return UserPhoneNumber;
-	}
-	public String getUserType() {
-		return UserType;
 	}
 	
 	public void setUserID(int UserID) {
@@ -41,17 +45,12 @@ public class User {
 	public void setUserEmail(String UserEmail) {
 		this.UserEmail = UserEmail;
 	}
-	public void setUserPassword(String UserPassword) {
-		this.UserPassword = UserPassword;
-	}
+
 	public void setUserAddress(String UserAddress) {
 		this.UserAddress = UserAddress;
 	}
 	public void setUserPhoneNumber(String UserPhoneNumber) {
 		this.UserPhoneNumber = UserPhoneNumber;
-	}
-	public void setUserType(String UserType) {
-		this.UserType = UserType;
 	}
 	
 }

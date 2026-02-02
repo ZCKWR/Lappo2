@@ -15,12 +15,13 @@
    
 </head>
 <body>
+<% String studentName = (String) session.getAttribute("username"); %>
 
     <div class="wrapper">
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-laptop"></i> <span>Lappo Student</span>
+                <i class="fas fa-laptop"></i> <span>Welcome <%= studentName %></span>
             </div>
             <div class="sidebar-nav">
                 <a href="ongoingRepairs" >
@@ -32,7 +33,7 @@
                 <a href="pastInvoices">
                     <i class="fas fa-history"></i> <span>History</span>
                 </a>
-                <a href="userProfile.jsp">
+                <a href="Profile">
                     <i class="fas fa-user-circle"></i> <span>Profile</span>
                 </a>
             </div>
@@ -92,7 +93,7 @@
     							<td><%= r.getUsername() %></td>
     							<td style="<%
     								String status = r.getCurrentStatus();
-    								if ("Completed".equalsIgnoreCase(status)) {
+    								if ("Complete".equalsIgnoreCase(status)) {
         								out.print("color: green; font-weight: bold;");
     								} else if ("Payment Pending".equalsIgnoreCase(status)) {
         								out.print("color: orange; font-weight: bold;");
@@ -108,7 +109,7 @@
 								<%
     								//String status = r.getCurrentStatus();
 
-    								if ("Payment Pending".equalsIgnoreCase(status)) {
+    								if ("Complete".equalsIgnoreCase(status)) {
 								%>
         								<button onclick="openPayment(<%= r.getRepairID() %>, <%= new userDAO.RepairDAO().getPaymentAmountByRepairID(r.getRepairID())  %>)">
             								Pay Now

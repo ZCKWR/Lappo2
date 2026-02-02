@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import userModel.Repair;
 
 @WebServlet("/repairStatus")
@@ -19,15 +20,19 @@ public class RepairStatusServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 		
+		HttpSession session = request.getSession();
+		Integer studentID = (Integer) session.getAttribute("userID");
+		
+		
 		String device = request.getParameter("device");
 
         RepairDAO dao = new RepairDAO();
         List<Repair> repairList;
         
         if(device != null && !device.trim().isEmpty()) {
-        	repairList = dao.getRepairStatusByDevice(device);
+        	repairList = dao.getRepairStatusByDevice(device, studentID);
         } else {
-        	repairList = dao.getRepairStatus();
+        	repairList = dao.getRepairStatus(studentID);
         }
         
         System.out.println("SEARCH DEVICE = " + device);

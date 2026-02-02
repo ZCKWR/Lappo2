@@ -107,20 +107,22 @@ public class RepairDAO {
         }
     }
     
-    public List<Repair> getRepairStatus() {
+    public List<Repair> getRepairStatus(int studentID) {
 
-        List<Repair> repairs = new ArrayList<>();
+        List<Repair> repairs = new ArrayList<>();    
 
         String sql =
         	    "SELECT r.RepairID, r.DateIssued, r.LaptopModel, r.Issue, " +
         	    "u.Username AS TechnicianName, r.CurrentStatus " +		
         	    "FROM REPAIR r " +
-        	    "LEFT JOIN USER u ON r.TechnicianID = u.UserID AND u.UserType = 'Technician'";
+        	    "LEFT JOIN USER u ON r.AssignedTech = u.UserID AND u.UserType = 'Technician'" +
+        	    "WHERE r.CustomerID = ?";
 
 
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentID);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -146,21 +148,22 @@ public class RepairDAO {
         return repairs;
     }
 
-    public List<Repair> getRepairStatusByDevice(String device) {
+    public List<Repair> getRepairStatusByDevice(String device, int studentID) {
 
         List<Repair> repairs = new ArrayList<>();
 
         String sql =
-        	    "SELECT r.RepairID, r.DateIssued, r.LaptopModel, r.Issue, r.CurrentStatus, " +
-        	    "COALESCE(u.Username, '—') AS Username " +
-        	    "FROM REPAIR r " +
-        	    "LEFT JOIN USER u ON r.TechnicianID = u.UserID " +
-        	    "WHERE LOWER(r.LaptopModel) LIKE LOWER(?)";
+        		    "SELECT r.RepairID, r.DateIssued, r.LaptopModel, r.issue, r.CurrentStatus, " +
+        	             "COALESCE(u.Username, '—') AS Username " +
+        	             "FROM repair r " +  // Lowercase table name
+        	             "LEFT JOIN `user` u ON r.AssignedTech = u.UserID " + // Backticks for reserved word
+        	             "WHERE LOWER(r.LaptopModel) LIKE LOWER(?) AND CustomerID = ?";
 
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "%" + device + "%"); // partial match
+            ps.setInt(2, studentID);
 
             ResultSet rs = ps.executeQuery();
 
@@ -175,7 +178,8 @@ public class RepairDAO {
 
                 repairs.add(r);
             }
-
+            
+            
             rs.close();
             ps.close();
             conn.close();

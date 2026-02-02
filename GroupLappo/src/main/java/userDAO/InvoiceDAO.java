@@ -12,24 +12,26 @@ import util.DBConnection;
 
 public class InvoiceDAO {
 
-    public List<Invoice> getPastInvoices() {
+    public List<Invoice> getPastInvoices(int studentID) {
 
         List<Invoice> invoices = new ArrayList<>();
 
         String sql = 
-        	    "SELECT i.InvoiceID, " +
-        	    "i.PaymentDate, " +
-        	    "r.LaptopModel, " +
-        	    "r.Issue, " +
-        	    "i.PaymentAmount " +
-        	    "FROM invoice i " +
-        	    "JOIN repair r ON i.RepairID = r.RepairID " +
-        	    "ORDER BY i.PaymentDate DESC";
+        		"SELECT i.InvoiceID, " +
+        	             "i.PaymentDate, " +
+        	             "r.LaptopModel, " +
+        	             "r.Issue, " +        
+        	             "i.PaymentAmount " +
+        	             "FROM invoice i " +
+        	             "JOIN repair r ON i.RepairID = r.RepairID " +
+        	             "WHERE r.CustomerID = ? " +  
+        	             "ORDER BY i.PaymentDate DESC";
 
 
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentID);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {

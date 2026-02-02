@@ -23,13 +23,14 @@
        
 </head>
 <body>
+<% String studentName = (String) session.getAttribute("username"); %>
 
     <div class="wrapper">
         
         <!-- SIDEBAR (Light Theme) -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-laptop"></i> <span>Lappo Student</span>
+                <i class="fas fa-laptop"></i> <span>Welcome <%= studentName %></span>
             </div>
             
             <div class="sidebar-nav">
@@ -42,7 +43,7 @@
                 <a href="pastInvoices">
                     <i class="fas fa-history"></i> <span>History</span>
                 </a>
-                <a href="userProfile.jsp">
+                <a href="Profile">
                     <i class="fas fa-user-circle"></i> <span>Profile</span>
                 </a>
                
