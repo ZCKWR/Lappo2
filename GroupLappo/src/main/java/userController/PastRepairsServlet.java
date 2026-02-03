@@ -19,15 +19,25 @@ public class PastRepairsServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+		
 
 		HttpSession session = request.getSession();
 		Integer studentID = (Integer) session.getAttribute("userID");
 		
-        RepairDAO dao = new RepairDAO();
-        List<Repair> repairList = dao.getPastRepairs(studentID);
+        RepairDAO repairDAO = new RepairDAO();
+        
+        int countPastRepair = repairDAO.countPastRepairs(studentID);
+        
+        System.out.println(countPastRepair);
+        
+        List<Repair> repairList = repairDAO.getPastRepairs(studentID);
 
+        request.setAttribute("countPastRepair", countPastRepair);
         request.setAttribute("repairList", repairList);
         request.getRequestDispatcher("UserDashboard.jsp")
                .forward(request, response);
     }
 }
+
+
+// NO USE 

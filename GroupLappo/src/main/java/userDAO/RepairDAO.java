@@ -16,7 +16,7 @@ public class RepairDAO {
 
         List<Repair> repairs = new ArrayList<>();
 
-        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair where CustomerID = ? AND CurrentStatus NOT IN ('Complete', 'Collected', 'Cancelled')";
+        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair where CustomerID = ? AND CurrentStatus NOT IN ('Complete', 'Paid', 'Cancelled')";
 
         try {
             Connection conn = DBConnection.getConnection();
@@ -51,7 +51,7 @@ public class RepairDAO {
 
         List<Repair> repairs = new ArrayList<>();
 
-        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair where CustomerID = ? AND CurrentStatus IN ('Complete', 'Collected', 'Cancelled')";
+        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair where CustomerID = ? AND CurrentStatus IN ('Complete', 'Paid', 'Cancelled')";
 
         try {
             Connection conn = DBConnection.getConnection();
@@ -148,6 +148,24 @@ public class RepairDAO {
 
         return repairs;
     }
+    
+    public int countPastRepairs(int studentID) {
+    	
+        String sql = "SELECT COUNT(*) FROM REPAIR WHERE CurrentStatus IN ('Complete', 'Paid', 'Cancelled') AND CustomerID = ?";
+        try {
+        	 Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             
+             ps.setInt(1, studentID);
+
+             ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     public List<Repair> getRepairStatusByDevice(String device, int studentID) {
 
@@ -156,8 +174,8 @@ public class RepairDAO {
         String sql =
         		    "SELECT r.RepairID, r.DateIssued, r.LaptopModel, r.issue, r.CurrentStatus, " +
         	             "COALESCE(u.Username, '—') AS Username " +
-        	             "FROM repair r " +  // Lowercase table name
-        	             "LEFT JOIN `user` u ON r.AssignedTech = u.UserID " + // Backticks for reserved word
+        	             "FROM repair r " +  
+        	             "LEFT JOIN `user` u ON r.AssignedTech = u.UserID " + 
         	             "WHERE LOWER(r.LaptopModel) LIKE LOWER(?) AND CustomerID = ?";
 
         try {
@@ -195,42 +213,20 @@ public class RepairDAO {
     public double getPaymentAmountByRepairID(int repairID) {
         double amount = 0.0;
 
-       /* String sql = "SELECT (IFNULL(SUM(p.UnitCost * rp.QuantityUsed), 0) + 50.00) AS TotalToPay " +
-                "FROM repair r " +
-                "LEFT JOIN repairpart rp ON r.RepairID = rp.RepairID " +
-                "LEFT JOIN part p ON rp.PartID = p.PartID " +
-                "WHERE r.RepairID = ?";
-        */
-        
         RepairDAO repairDAO = new RepairDAO();
         double part = repairDAO.getPartCostByRepairID(repairID);    
         amount = part + 50.00;
 
-    /*  try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, repairID);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                amount = rs.getDouble(1);
-            }
-
-            rs.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        */
 
         return amount;
     }
     
-    public int countByStatus(String status) {
-        String sql = "SELECT COUNT(*) FROM REPAIR WHERE CurrentStatus = ?";
+    public int countActiveRepairs(int studentID) {
+        String sql = "SELECT COUNT(*) FROM REPAIR WHERE CurrentStatus NOT IN ('Complete', 'Paid', 'Cancelled') AND CustomerID = ? ";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, status);
+            ps.setInt(1, studentID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1);
         } catch (Exception e) {

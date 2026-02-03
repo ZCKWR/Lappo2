@@ -25,10 +25,12 @@ public class OngoingRepairsServlet extends HttpServlet {
 
         RepairDAO repairDAO = new RepairDAO();
         
-        int activeRepairs = repairDAO.countByStatus("In Progress");
+        int activeRepairs = repairDAO.countActiveRepairs(studentID);
         int totalRepairs = repairDAO.countAllRepairs(studentID);
         double amountDue = repairDAO.sumPendingPayments();
-
+        int countPastRepair = repairDAO.countPastRepairs(studentID);
+  
+        request.setAttribute("countPastRepair", countPastRepair);
         request.setAttribute("activeRepairs", activeRepairs);
         request.setAttribute("totalRepairs", totalRepairs);
         request.setAttribute("amountDue", amountDue);

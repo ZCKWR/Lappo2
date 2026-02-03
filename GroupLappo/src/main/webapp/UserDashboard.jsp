@@ -50,7 +50,7 @@
             </div>
 
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='index.html'">
+                <button class="btn-logout" onclick="window.location.href='Index.html'">
                     <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
                 </button>
             </div>
@@ -119,7 +119,7 @@
             <div class="panel">
                 <div class="panel-header">
                     <h2>Ongoing Repairs</h2>
-                    <span class="badge badge-progress">1 Active</span>
+                    <span class="badge badge-progress"><%= request.getAttribute("activeRepairs") %> Active</span>
                 </div>
                 
                 <table class="data-table">
@@ -159,6 +159,7 @@
             <div class="panel">
                 <div class="panel-header">
                     <h2>Past Repairs</h2>
+                    <span class="badge badge-progress"><%= request.getAttribute("countPastRepair") %> Complete</span>
                 </div>
                 <table class="data-table">
                     <thead>
