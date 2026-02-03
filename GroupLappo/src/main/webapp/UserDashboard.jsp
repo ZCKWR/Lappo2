@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="userModel.Repair" %>
-<%@ page import="userModel.User" %>
+<%@ page import="userModel.Student" %>
 <%@ page import="userDAO.RepairDAO" %>
 
 <%
@@ -65,9 +65,9 @@
                     <h1>Welcome, Student</h1>
                     <p>Here's what's happening with your devices today.</p>
                 </div>
-                <div class="user-profile" onclick="window.location.href='userProfile.jsp'">
+                <div class="user-profile" onclick="window.location.href='Profile'">
                     <i class="far fa-bell" style="font-size: 1.2em; color: var(--light-text-color); cursor: pointer;" onclick="event.stopPropagation()"></i>
-                    <span>Zakwan Imran</span>
+                    <span><%= studentName %></span>
                     <div class="avatar-circle"><i class="fas fa-user"></i></div>
                 </div>
             </header>
@@ -181,10 +181,10 @@
     						<td><%= r.getIssue() %></td>
     						<td><%= r.getDateIssued() %></td>
     						<td><%= r.getCurrentStatus() %></td>
-                        </tr>
+                        </tr> 
                         <%			
-                        		}
-                        	}
+                        }
+                        }
                         %>
                     </tbody>
                 </table>

@@ -56,4 +56,47 @@ public class InvoiceDAO {
 
         return invoices;
     }
+    
+    public boolean insertInvoice(int studentID, int repairID, String paymentType) {
+
+        RepairDAO repairDAO = new RepairDAO();
+        double part = repairDAO.getPartCostByRepairID(repairID);    
+        double amount = repairDAO.getPaymentAmountByRepairID(repairID);
+    
+
+        String sql = "INSERT INTO invoice (PaymentAmount, PaymentType, PaymentDate, LabourCost, PartCost, StudentID, RepairID) " +
+                     "VALUES (?, ?, NOW(), 50.00, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setDouble(1, amount);
+            ps.setString(2, paymentType);
+            ps.setDouble(3, part);
+            ps.setInt(4, studentID);
+            ps.setInt(5, repairID);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+     
+    public boolean markAsPaidIfComplete(int repairID) {
+        String sql = "UPDATE repair SET CurrentStatus='Paid' WHERE repairID=? AND CurrentStatus='Complete'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, repairID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 }

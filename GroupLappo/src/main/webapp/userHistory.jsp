@@ -51,9 +51,9 @@
                     <h1>Repair History</h1>
                     <p style="color: var(--light-text-color); margin-top: 5px;">View your past service records.</p>
                 </div>
-                <div class="user-profile" onclick="window.location.href='userProfile.jsp'">
+                <div class="user-profile" onclick="window.location.href='Profile'">
                     <i class="far fa-bell" style="font-size: 1.2em; color: var(--light-text-color); cursor: pointer;" onclick="event.stopPropagation()"></i>
-                    <span>Zakwan</span>
+                    <span><%= studentName %></span>
                     <div class="avatar-circle"><i class="fas fa-user"></i></div>
                 </div>
             </header>

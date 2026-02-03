@@ -1,17 +1,26 @@
 package userModel;
 
 public class Repair {
-
+	
+	public int studentID;
     public int RepairID;
     public String DateIssued;
-    public String LaptopModel;
+	public String LaptopModel;
     public String TechnicianRemarks;
     public String CurrentStatus;
     public String Issue;
     public String Description;
     public String Username;
     public double PaymentAmount;
-
+    
+    
+    
+    public void setStudentID(int studentID) {
+		this.studentID = studentID;
+	}
+    public int getStudentID() {
+		return studentID;
+	}
     public int getRepairID() {
         return RepairID;
     }

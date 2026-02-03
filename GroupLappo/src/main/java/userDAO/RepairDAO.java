@@ -87,8 +87,8 @@ public class RepairDAO {
         try {
             Connection con = DBConnection.getConnection();
 
-            String sql = "INSERT INTO REPAIR (LaptopModel, Issue, Description, DateIssued, CurrentStatus) " +
-                         "VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO repair (LaptopModel, Issue, repairDesc, DateIssued, CurrentStatus, CustomerID) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
 
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, repair.LaptopModel);
@@ -96,6 +96,7 @@ public class RepairDAO {
             ps.setString(3, repair.Description);
             ps.setString(4, repair.DateIssued);
             ps.setString(5, repair.CurrentStatus);
+            ps.setInt(6, repair.studentID);
 
             ps.executeUpdate();
             con.close();
@@ -194,22 +195,32 @@ public class RepairDAO {
     public double getPaymentAmountByRepairID(int repairID) {
         double amount = 0.0;
 
-        String sql = "SELECT PaymentAmount FROM INVOICE WHERE RepairID = ?";
+       /* String sql = "SELECT (IFNULL(SUM(p.UnitCost * rp.QuantityUsed), 0) + 50.00) AS TotalToPay " +
+                "FROM repair r " +
+                "LEFT JOIN repairpart rp ON r.RepairID = rp.RepairID " +
+                "LEFT JOIN part p ON rp.PartID = p.PartID " +
+                "WHERE r.RepairID = ?";
+        */
+        
+        RepairDAO repairDAO = new RepairDAO();
+        double part = repairDAO.getPartCostByRepairID(repairID);    
+        amount = part + 50.00;
 
-        try (Connection conn = DBConnection.getConnection();
+    /*  try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, repairID);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                amount = rs.getDouble("PaymentAmount");
+                amount = rs.getDouble(1);
             }
 
             rs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        */
 
         return amount;
     }
@@ -249,7 +260,7 @@ public class RepairDAO {
             "SELECT COALESCE(SUM(i.PaymentAmount), 0) " +
             "FROM INVOICE i " +
             "JOIN REPAIR r ON i.RepairID = r.RepairID " +
-            "WHERE r.CurrentStatus <> 'Completed'";
+            "WHERE r.CurrentStatus <> 'Complete'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -260,6 +271,55 @@ public class RepairDAO {
             e.printStackTrace();
         }
         return 0.0;
+    }
+    
+    public double getLabourCostByRepairID(int repairID) {
+        double amount = 0.0;
+
+        String sql = "SELECT LabourCost FROM INVOICE WHERE RepairID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, repairID);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                amount = rs.getDouble("LabourCost");
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return amount;
+    }
+    
+    public double getPartCostByRepairID(int repairID) {
+        double amount = 0.0;
+
+        String sql = "SELECT SUM(p.UnitCost * rp.QuantityUsed) " +
+                "FROM part p " +
+                "JOIN repairpart rp ON p.PartID = rp.PartID " +
+                "WHERE rp.RepairID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, repairID);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                amount = rs.getDouble(1);
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return amount;
     }
    
          

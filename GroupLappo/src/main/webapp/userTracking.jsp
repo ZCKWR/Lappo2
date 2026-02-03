@@ -97,9 +97,12 @@
         								out.print("color: green; font-weight: bold;");
     								} else if ("Payment Pending".equalsIgnoreCase(status)) {
         								out.print("color: orange; font-weight: bold;");
+    								} else if ("Paid".equalsIgnoreCase(status)) {
+        								out.print("color: orange; font-weight: bold;");
     								} else {
         								out.print("color: black;");
     								}
+    							
 								%>">
     								<%= status %>
 								</td>
@@ -115,7 +118,7 @@
             								Pay Now
         								</button>
 								<%
-    								} else if ("Completed".equalsIgnoreCase(status)) {
+    								} else if ("Paid".equalsIgnoreCase(status)) {
 								%>
         								<button onclick="openInvoice(<%= r.getRepairID() %>)">
             								View Invoice
@@ -155,10 +158,13 @@
                 <p>Completing payment for <span id="p_id" style="font-weight: bold;">#REQ-000</span></p>
             </div>
             
-            <form onsubmit="event.preventDefault(); processPayment();">
+            <form  id="paymentForm" method="post" action="SubmitPayment" onsubmit="event.preventDefault(); processPayment();">
+            
+                <input type="hidden" name="repairID" id="repairIDInput">
+    			<input type="hidden" name="amount" id="amountInput">
                 <div class="form-group">
                     <label>Payment Method</label>
-                    <select id="paymentMethod" onchange="togglePaymentFields()">
+                    <select id="paymentMethod" name="paymentMethod" onchange="togglePaymentFields()">
                         <option value="card">Credit/Debit Card</option>
                         <option value="online">Online Banking (FPX)</option>
                     </select>
@@ -205,7 +211,7 @@
                 
                 <div class="receipt-total" style="margin-bottom: 20px;">
                     <span>Amount to Pay</span>
-                    <span style="color: var(--primary-color);" id="p_amount">RM 0.00</span>
+                    <span style="color: var(--primary-color);" id="p_amount">RM </span>
                 </div>
                 
                 <button type="submit" class="btn-confirm-pay">Confirm Payment</button>
@@ -243,7 +249,7 @@
 
         <div class="receipt-total" style="margin-bottom: 20px;">
             <span>Total Paid</span>
-            <span style="color: var(--primary-color);" id="i_amount">RM 0.00</span>
+            <span style="color: var(--primary-color);" id="i_amount">RM</span>
         </div>
 
         <button class="btn-confirm-pay" onclick="closeModal('invoiceModal')">
@@ -269,6 +275,10 @@
         	
         	//Set the amount
             document.getElementById('p_amount').textContent = "RM " + amount.toFixed(2);
+        	
+        	//for update the status 
+            document.getElementById('repairIDInput').value = repairID;
+            document.getElementById('amountInput').value = amount.toFixed(2);
         	
         	// Show the modal
             document.getElementById('paymentModal').style.display = 'flex';
@@ -297,11 +307,13 @@
             
             setTimeout(() => {
                 alert("Payment Successful!");
-                closeModal('paymentModal');
-                btn.textContent = originalText;
-                btn.disabled = false;
+                
+                document.getElementById("paymentForm").submit();
+               // closeModal('paymentModal');
+               // btn.textContent = originalText;
+                // btn.disabled = false;
                 // In a real app, you would likely reload the page or update the table row here
-                 location.reload(); 
+                // location.reload(); 
             }, 1500);
         }
 
@@ -341,7 +353,7 @@
         
         const invoiceData = {
                 <% for (Repair r : statusRepairList) {
-                    if ("Completed".equalsIgnoreCase(r.getCurrentStatus())) {
+                    if ("Paid".equalsIgnoreCase(r.getCurrentStatus())) {
                 %>
                 <%= r.getRepairID() %>: {
                     device: "<%= r.getLaptopModel() %>",
