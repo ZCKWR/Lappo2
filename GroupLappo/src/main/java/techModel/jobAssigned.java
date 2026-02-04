@@ -9,13 +9,27 @@ public class jobAssigned {
 	private String Email; 
 	private String SerialNumber; 
 	private Date DateIssued;
+	private String Issue;
 	private String UserNote;
 	private String CurrentStatus;
 	private String Remarks;
 	
 	public jobAssigned() {};
 	
-
+	public jobAssigned(int repairID, String userName, String laptopModel, String email, String serialNumber,
+			Date dateIssued, String issue, String userNote, String currentStatus, String remarks) {
+		super();
+		RepairID = repairID;
+		UserName = userName;
+		LaptopModel = laptopModel;
+		Email = email;
+		SerialNumber = serialNumber;
+		DateIssued = dateIssued;
+		Issue = issue;
+		UserNote = userNote;
+		CurrentStatus = currentStatus;
+		Remarks = remarks;
+	}
 
 
 	public String getUserNote() {
@@ -60,18 +74,16 @@ public class jobAssigned {
 
 
 
-	public jobAssigned(int repairID, String userName, String laptopModel, String email, String serialNumber,
-			Date dateIssued, String userNote, String currentStatus, String remarks) {
-		super();
-		RepairID = repairID;
-		UserName = userName;
-		LaptopModel = laptopModel;
-		Email = email;
-		SerialNumber = serialNumber;
-		DateIssued = dateIssued;
-		UserNote = userNote;
-		CurrentStatus = currentStatus;
-		Remarks = remarks;
+
+	public String getIssue() {
+		return Issue;
+	}
+
+
+
+
+	public void setIssue(String issue) {
+		Issue = issue;
 	}
 
 

@@ -50,14 +50,16 @@
         <nav class="sidebar">
             <div class="sidebar-header"><i class="fas fa-laptop"></i> <span>Lappo Admin</span></div>
             <div class="sidebar-nav">
-                <a href="admin_dashboard.jsp"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+                <a href="Dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
                 <a href="admin_active_repair.jsp"><i class="fas fa-wrench"></i> <span>Repairs</span></a>
                 <a href="admin_inventory.jsp"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
                 <a href="admin_users.jsp" class="active"><i class="fas fa-users"></i> <span>Users</span></a>
                 <a href="adminProfile.jsp"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
             </div>
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='index.html'"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </button>
             </div>
         </nav>
 

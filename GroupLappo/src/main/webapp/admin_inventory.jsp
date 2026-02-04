@@ -15,9 +15,11 @@
         return;
     }
 
-    // 2. Fetch Inventory Stats
+    // 2. Fetch Inventory Statss
     inventoryDAO invDao = new inventoryDAO();
     List<Map<String, Object>> inventoryList = invDao.getAllInventory();
+    
+    int countTotalPart = invDao.countTotalPart();
     
     int totalItems = 0;
     int lowStockCount = 0;
@@ -69,11 +71,16 @@
         <nav class="sidebar">
             <div class="sidebar-header"><i class="fas fa-laptop"></i> <span>Lappo Admin</span></div>
             <div class="sidebar-nav">
-                <a href="dashboardController"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+                <a href="Dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
                 <a href="admin_active_repair.jsp"><i class="fas fa-wrench"></i> <span>Repairs</span></a>
                 <a href="admin_inventory.jsp" class="active"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
                 <a href="admin_users.jsp"><i class="fas fa-users"></i> <span>Users</span></a>
                 <a href="adminProfile.jsp"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
+            </div>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </button>
             </div>
         </nav>
 
@@ -94,7 +101,7 @@
 
             <div id="inventory-section">
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-info"><h3>Total Items</h3><p class="number"><%= totalItems %></p></div></div>
+                    <div class="stat-card"><div class="stat-info"><h3>Total Items</h3><p class="number"><%= countTotalPart %></p></div></div>
                     <div class="stat-card"><div class="stat-info"><h3>Low Stock</h3><p class="number" style="color: #f1c40f;"><%= lowStockCount %></p></div></div>
                     <div class="stat-card"><div class="stat-info"><h3>Out of Stock</h3><p class="number" style="color: #e74c3c;"><%= outOfStockCount %></p></div></div>
                     <div class="stat-card"><div class="stat-info"><h3>Total Value</h3><p class="number">RM <%= String.format("%.2f", totalInventoryValue) %></p></div></div>
@@ -128,6 +135,9 @@
                                 <td>
                                     <button class="btn-sm" style="background:#3498db; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:4px;" onclick="openRestockModal('<%= item.get("id") %>', '<%= item.get("name") %>')">Restock</button>
                                     <button class="btn-sm" style="background:#f39c12; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:4px;" onclick="openEditModal('<%= item.get("id") %>', '<%= item.get("name") %>', '<%= item.get("brand") %>', '<%= qty %>', '<%= item.get("cost") %>')">Edit</button>
+                                     <button class="btn-sm btn-delete" onclick="confirmDelete('<%= item.get("id") %>')">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
                                 </td>
                             </tr>
                             <% } %>
@@ -306,6 +316,35 @@
             document.getElementById('editItemPrice').value = cost;
             openModal('editItemModal');
         }
+        //delete for inventorys
+        
+        function confirmDelete(id) {
+    if (!confirm("Permanently delete Part ID: " + id + "?")) {
+        return;
+    }
+
+    fetch("InventoryDelete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "partID=" + encodeURIComponent(id)
+    })
+    .then(response => {
+        if (response.ok) {
+            // reload inventory after delete
+            window.location.reload();
+        } else {
+            alert("Failed to delete part.");
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Error deleting part.");
+    });
+}
+    
+        
     </script>
 </body>
 </html>

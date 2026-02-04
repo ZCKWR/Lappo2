@@ -31,6 +31,38 @@ public class inventoryDAO {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
+    
+    public int countTotalPart() {
+    	
+	int count = 0;
+	
+	try {
+	
+	Class.forName("com.mysql.jdbc.Driver");
+    Connection con = DriverManager.getConnection(
+    "jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!"); 
+    
+    String sql = "SELECT COUNT(*) AS TotalPartTypes FROM part; ";
+    
+    PreparedStatement ps = con.prepareStatement(sql);
+    
+
+    ResultSet rs = ps.executeQuery();
+    
+    if (rs.next()) {
+        // Retrieve the first column (the count)
+        count = rs.getInt(1);
+    }
+    
+	}catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    return count;	 
+         		 
+        		 
+}
+
 
     // 2. Add New Item to 'part' table
     public boolean addItem(String name, String brand, int qty, double cost) {
@@ -144,4 +176,48 @@ public class inventoryDAO {
             return false;
         }
     }
+    
+    public boolean isPartUsed(int partID) {
+ 	   
+	    try {
+	    	Class.forName("com.mysql.jdbc.Driver");
+		    Connection con = DriverManager.getConnection(
+		    "jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!"); 
+
+	    String sql = "SELECT COUNT(*) FROM repairpart WHERE PartID = ?;";
+	    
+	    PreparedStatement ps = con.prepareStatement(sql);
+	    ps.setInt(1, partID);
+
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+        	 return rs.getInt(1) > 0;
+        }
+        
+	}catch (Exception e) {
+        e.printStackTrace();
+    }
+	    return true;
+	}
+	
+	public boolean deletePart(int partID) {
+
+	    try {
+	    	Class.forName("com.mysql.jdbc.Driver");
+		    Connection con = DriverManager.getConnection(
+		    "jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!"); 
+	    	
+	    	  String sql = "DELETE FROM part WHERE PartID = ?";
+	    	  
+	    	  PreparedStatement ps = con.prepareStatement(sql);
+	  	      ps.setInt(1, partID);
+
+	  	    return ps.executeUpdate() > 0;
+	    	
+	    }catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return false;	         	
+}
 }

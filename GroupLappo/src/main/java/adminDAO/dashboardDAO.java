@@ -45,7 +45,7 @@ public int countTotalActiveJobs() {
 	    Connection con = DriverManager.getConnection(
 	    "jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!"); 
 	    
-	    String sql = "SELECT COUNT(*) FROM repair WHERE CurrentStatus NOT IN ('Complete', 'Collected', 'Cancelled')";
+	    String sql = "SELECT COUNT(*) FROM repair WHERE CurrentStatus NOT IN ('Complete', 'Paid', 'Cancelled')";
 	    
 	    PreparedStatement ps = con.prepareStatement(sql);
         // Set the technician ID from the parameter
@@ -74,7 +74,7 @@ public int countTotalCompleteJob() {
 	    Connection con = DriverManager.getConnection(
 	    "jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!"); 
 	    
-	    String sql = "SELECT COUNT(*) FROM repair WHERE CurrentStatus IN ('Complete', 'Collected', 'Cancelled')";
+	    String sql = "SELECT COUNT(*) FROM repair WHERE CurrentStatus IN ('Complete', 'Paid', 'Cancelled')";
 	    
 	    PreparedStatement ps = con.prepareStatement(sql);
         // Set the technician ID from the parameter
@@ -103,7 +103,7 @@ public int countTotalPendingJob() {
 	    Connection con = DriverManager.getConnection(
 	    "jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!"); 
 	    
-	    String sql = "SELECT COUNT(*) FROM repair WHERE ApprovedBy IS NULL";
+	    String sql = "SELECT COUNT(*) FROM repair WHERE AssignedTech IS NULL";
 	    
 	    PreparedStatement ps = con.prepareStatement(sql);
         // Set the technician ID from the parameter
@@ -122,4 +122,6 @@ public int countTotalPendingJob() {
 	
 	return count;
 }
+
+
 }

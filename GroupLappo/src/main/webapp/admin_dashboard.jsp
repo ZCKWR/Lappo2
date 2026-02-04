@@ -25,7 +25,7 @@
         String status = (String)r.get("status");
         if("In Progress".equals(status)) activeRepairs++;
         if("Complete".equals(status)) completedRepairs++;
-        if("Pending".equals(status)) {
+        if("Pending".equals(status) || "Awaiting for technicians to be assigned".equals(status)) {
             pendingJobsCount++;
             pendingQueue.add(r); // Add to dashboard queue
         }
@@ -57,11 +57,16 @@
         <nav class="sidebar">
             <div class="sidebar-header"><i class="fas fa-laptop"></i> <span>Lappo Admin</span></div>
             <div class="sidebar-nav">
-                <a href="dashboardController" class="active"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+                <a href="Dashboard" class="active"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
                 <a href="admin_active_repair.jsp"><i class="fas fa-wrench"></i> <span>Repairs</span></a>
                 <a href="admin_inventory.jsp"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
                 <a href="admin_users.jsp"><i class="fas fa-users"></i> <span>Users</span></a>
                 <a href="adminProfile.jsp"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
+            </div>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </button>
             </div>
         </nav>
 
@@ -109,11 +114,14 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Customer</th>
+                        	<th>Repair ID</th>
+                            <th>Customer ID</th>
+                            <th>Customer Name</th>
                             <th>Applied Date</th>
                             <th>Device</th>
+                            <th>Issue</th>
+                            <th>Customer Note</th>
                             <th>Status</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,29 +135,14 @@
                                 for (Map<String, Object> job : pendingQueue) { 
                         %>
                         <tr>
-                            <td>
-							    <% 
-							        // 1. Get the current status from the map
-							        String currentStatus = (String) job.get("status"); 
-							
-							        // 2. Logic: Only show buttons if the status is NOT 'Completed' or 'Rejected'
-							        if (currentStatus != null && 
-							           !"Completed".equalsIgnoreCase(currentStatus) && 
-							           !"Rejected".equalsIgnoreCase(currentStatus)) { 
-							    %>
-							        <button class="btn-sm" 
-							                style="background:#3498db; color:white; border:none; padding:6px 12px; cursor:pointer; border-radius:4px;"
-							                onclick="openAssignModal('<%= job.get("id") %>')">
-							            Assign
-							        </button>
-							    <% 
-							        } else { 
-							    %>
-							        <span class="badge" style="background:#bdc3c7; color:white;">Closed</span>
-							    <% 
-							        } 
-							    %>
-							</td>
+                         <td><%= job.get("id") %></td>
+    					<td><%= job.get("customerId") %></td>
+    					<td><%= job.get("customer") %></td>
+    					<td><%= job.get("date") %></td>
+    					<td><%= job.get("device") %></td>
+    			     	<td><%= job.get("issue") %></td>
+    					<td><%= job.get("customerNote") %></td>
+    					<td><%= job.get("status") %></td>
                         </tr>
                         <% 
                                 } 

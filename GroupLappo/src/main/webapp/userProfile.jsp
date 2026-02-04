@@ -47,9 +47,9 @@
                 
             </div>
             
-             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='index.html'">
-                    <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </button>
             </div>
         </nav>

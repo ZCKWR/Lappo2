@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.*;
 
+import adminDAO.inventoryDAO;
+
 @WebServlet("/InventoryController")
 public class InventoryController extends HttpServlet {
     private String dbURL = "jdbc:mysql://localhost:3306/lappo2";
@@ -20,6 +22,7 @@ public class InventoryController extends HttpServlet {
         
         Connection con = null;
         PreparedStatement ps = null;
+        
 
         try {
             // Using the old MySQL driver
@@ -61,6 +64,7 @@ public class InventoryController extends HttpServlet {
         }
 
         // Redirect back with status for feedback
+       // response.sendRedirect("InventoryController");
         response.sendRedirect("admin_inventory.jsp?status=" + (success ? action + "_success" : "error"));
     }
 }

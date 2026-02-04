@@ -54,11 +54,12 @@ public class jobServlet extends HttpServlet {
 	    	             "u_owner.Username AS OwnerName, " +
 	    	             "u_owner.UserEmail AS OwnerEmail, " +
 	    	             "r.LaptopModel, r.SerialNumber, r.DateIssued, " +
-	    	             "r.repairDesc, r.CurrentStatus, r.TechnicianRemarks " +
+	    	             "r.repairDesc, r.CurrentStatus, r.Issue, r.TechnicianRemarks " +
 	    	             "FROM repair r " +
 	    	             "JOIN user u_owner ON r.CustomerID = u_owner.UserID " +
 	    	             "WHERE r.AssignedTech = ? " +
-	    	             "AND r.CurrentStatus != 'Complete'";
+	    	             "AND r.CurrentStatus NOT IN ('Complete', 'Paid') " +
+	    	             "ORDER BY r.DateIssued ASC";
 	                    
 
 	           PreparedStatement ps = con.prepareStatement(sql);
@@ -75,6 +76,7 @@ public class jobServlet extends HttpServlet {
 	                rs.getString("LaptopModel"),
 	                rs.getString("SerialNumber"),
 	                rs.getDate("DateIssued"),
+	                rs.getString("Issue"),
 	                rs.getString("repairDesc"),
 	                rs.getString("CurrentStatus"),
 	                rs.getString("TechnicianRemarks")

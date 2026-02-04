@@ -37,7 +37,7 @@
         <nav class="sidebar">
             <div class="sidebar-header"> <i class="fas fa-laptop"></i> <span>Lappo Admin</span> </div>
             <div class="sidebar-nav">
-               <a href="admin_dashboard.jsp">
+               <a href="Dashboard">
                     <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
                 </a>
                 <a href="admin_active_repair.jsp">

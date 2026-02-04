@@ -336,7 +336,7 @@ import="javax.naming.*, javax.sql.*" %>
             </div>
 
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='index.html'">
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
                     <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </button>
             </div>
@@ -396,6 +396,7 @@ import="javax.naming.*, javax.sql.*" %>
                         <tr>
                             <th>User</th>
                             <th>Approved Date</th>
+                            <th>Issue</th>
                             <th>Description</th>
                             <th>Status</th>
                             <th>Note</th>
@@ -404,7 +405,7 @@ import="javax.naming.*, javax.sql.*" %>
                     <tbody>  
             <%
             // 1. Manually retrieve the list from the request
-           List<jobView> list = (List<jobView>) session.getAttribute("job");
+           List<jobView> list = (List<jobView>) session.getAttribute("ActiveJob");
             
             // 2. Check if the list exists and loop through it
             if (list != null && !list.isEmpty()) {
@@ -415,6 +416,7 @@ import="javax.naming.*, javax.sql.*" %>
                         <tr>
                             <td><strong><%= s.getUsername() %></strong></td>
                             <td><%= s.getApproveDate() %></td>
+                            <td><%= s.getIssue() %></td>
                             <td><%= s.getRepairDesc() %></td>
                             <td><span class="badge badge-warning"><%= s.getCurrentStatus() %></span></td>
                             <td>
@@ -432,8 +434,58 @@ import="javax.naming.*, javax.sql.*" %>
                     </tbody>
                 </table>
             </div>
+                  <!-- Table: Verification Queue -->
+            <div class="panel"> 
+                <div class="panel-header">
+                    <h2>Past Job</h2>
+                    <span class="badge badge-warning">3 Pending</span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Approved Date</th>
+                            <th>Issue</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>  
+            <%
+            // 1. Manually retrieve the list from the request
+           List<jobView> pastList = (List<jobView>) session.getAttribute("pastRepairs");
+            
+            // 2. Check if the list exists and loop through it
+            if (pastList != null && !pastList.isEmpty()) {
+                for (jobView past : pastList) {
+               
+        	%>
+        	
+                        <tr>
+                            <td><strong><%= past.getUsername() %></strong></td>
+                            <td><%= past.getApproveDate() %></td>
+                            <td><%= past.getIssue() %></td>
+                            <td><%= past.getRepairDesc() %></td>
+                            <td><span class="badge badge-warning"><%= past.getCurrentStatus() %></span></td>
+                            <td>
+                                <p> <%= past.getTechRemarks() %> </p>
+                            </td>
+                        </tr>
+                        <% 
+                }
+            } else {
+        	%>
+                <tr><td colspan="3">No data received from Servlet.</td></tr>
+       	 	<% 
+           	 } 
+       		 %> 
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
+    
 
 </body>
 </html>

@@ -12,14 +12,21 @@ public class repairDAO {
     // 1. Fetch All Repairs for Active Repairs Page
     public List<Map<String, Object>> getAllRepairs() {
         List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT r.RepairID, u.Username AS CustomerName, u.UserID AS CustomerID, " +
-                     "r.LaptopModel, r.CurrentStatus, r.DateIssued, tech.Username AS TechName, " +
-                     "(i.LabourCost + i.PartCost) AS CalculatedPrice " +
-                     "FROM Repair r " +
-                     "LEFT JOIN User u ON r.CustomerID = u.UserID " + 
-                     "LEFT JOIN User tech ON r.AssignedTech = tech.UserID " +
-                     "LEFT JOIN Invoice i ON r.RepairID = i.RepairID " + 
-                     "ORDER BY r.DateIssued DESC";
+        String sql = "SELECT r.RepairID, " +
+                "u.Username AS CustomerName, " +
+                "u.UserID AS CustomerID, " +
+                "r.LaptopModel, " +
+                "r.issue, " +       // <--- New Item 1
+                "r.repairDesc, " +  // <--- New Item 2
+                "r.CurrentStatus, " +
+                "r.DateIssued, " +
+                "tech.Username AS TechName, " +
+                "(i.LabourCost + i.PartCost) AS CalculatedPrice " +
+                "FROM repair r " +
+                "LEFT JOIN `user` u ON r.CustomerID = u.UserID " + 
+                "LEFT JOIN `user` tech ON r.AssignedTech = tech.UserID " +
+                "LEFT JOIN invoice i ON r.RepairID = i.RepairID " + 
+                "ORDER BY r.DateIssued DESC";
         try {
             Class.forName(driver);
             try (Connection con = DriverManager.getConnection(dbURL, dbUser, dbPass);
@@ -35,6 +42,8 @@ public class repairDAO {
                     r.put("status", rs.getString("CurrentStatus"));
                     r.put("date", rs.getTimestamp("DateIssued"));
                     r.put("price", rs.getObject("CalculatedPrice"));
+                    r.put("issue", rs.getObject("issue"));
+                    r.put("customerNote", rs.getObject("repairDesc"));
                     list.add(r);
                 }
             }

@@ -44,6 +44,14 @@ public class jobController extends HttpServlet {
 		
 		int totalCompleted = dao.countCompletedRepairs(technicianId);
 		
+		List<jobView> pastComplete = dao.viewPastRepairs(technicianId);
+		
+		for (jobView job : pastComplete) {
+		    System.out.println(job.getUsername());
+		}
+		
+		session.setAttribute("pastRepairs", pastComplete);
+		
 		request.setAttribute("completedCount", totalCompleted);
 		
 		
@@ -56,23 +64,24 @@ public class jobController extends HttpServlet {
 		"jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!");
 		
 		if(technicianId != null) {
-			String sql = "SELECT u.Username, r.DateIssued, r.repairDesc, r.CurrentStatus, r.TechnicianRemarks " +
-                    "FROM repair r " +
-                    "JOIN user u ON r.CustomerID = u.UserID " +
-                    "WHERE r.AssignedTech = ?";
+			String sql = "SELECT u.Username, r.DateIssued, r.Issue, r.repairDesc, r.CurrentStatus, r.TechnicianRemarks " +
+		             "FROM repair r " +
+		             "JOIN user u ON r.CustomerID = u.UserID " +
+		             "WHERE r.AssignedTech = ? AND CurrentStatus NOT IN ('Complete', 'Paid')";
 		
 		
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setInt(1, technicianId);
         ResultSet rs = ps.executeQuery();
         
-        System.out.println("Current Tech ID: " + technicianId);
+        //System.out.println("Current Tech ID: " + technicianId);
         
         while (rs.next()) {
             // Match the constructor in your JavaBean
             jobView s = new jobView(
                 rs.getString("Username"), 
                 rs.getDate("DateIssued"),
+                rs.getString("Issue"),
                 rs.getString("repairDesc"),
                 rs.getString("CurrentStatus"),
                 rs.getString("TechnicianRemarks")
@@ -82,7 +91,7 @@ public class jobController extends HttpServlet {
         }
         int assignedJobsCount = job.size();
 
-        session.setAttribute("job", job);
+        session.setAttribute("ActiveJob", job);
         session.setAttribute("assignedJobsCount", assignedJobsCount);
 		
 		con.close();

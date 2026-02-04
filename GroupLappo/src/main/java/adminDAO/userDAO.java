@@ -38,8 +38,7 @@ public class userDAO {
         Connection con = null;
         try {
             Class.forName(driver);
-            con = DriverManager.getConnection(dbURL, dbUser, dbPass);
-            con.setAutoCommit(false); 
+            con = DriverManager.getConnection(dbURL, dbUser, dbPass); 
 
             String sqlUser = "INSERT INTO User (Username, UserEmail, UserPassword, UserAddress, UserPhoneNumber, UserType) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement psUser = con.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
@@ -51,28 +50,10 @@ public class userDAO {
             psUser.setString(6, role);
             psUser.executeUpdate();
 
-            ResultSet rs = psUser.getGeneratedKeys();
-            if (rs.next()) {
-                int newId = rs.getInt(1);
-                String sqlChild = "";
-                if ("Student".equalsIgnoreCase(role)) sqlChild = "INSERT INTO Student (UserID, CampusName) VALUES (?, 'Not Set')";
-                else if ("Technician".equalsIgnoreCase(role)) sqlChild = "INSERT INTO Technician (UserID, HourlyRate) VALUES (?, 0.00)";
-                else if ("Admin".equalsIgnoreCase(role)) sqlChild = "INSERT INTO Admin (UserID, DateHired) VALUES (?, CURDATE())";
-
-                if (!sqlChild.isEmpty()) {
-                    PreparedStatement psChild = con.prepareStatement(sqlChild);
-                    psChild.setInt(1, newId);
-                    psChild.executeUpdate();
-                }
-            }
-            con.commit();
             return true;
         } catch (Exception e) {
-            if (con != null) try { con.rollback(); } catch (SQLException ex) {}
             e.printStackTrace();
             return false;
-        } finally {
-            if (con != null) try { con.close(); } catch (SQLException e) {}
         }
     }
 

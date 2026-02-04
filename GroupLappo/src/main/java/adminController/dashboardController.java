@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Servlet implementation class dashboardController
  */
-@WebServlet("/dashboardController")
+@WebServlet("/Dashboard")
 public class dashboardController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

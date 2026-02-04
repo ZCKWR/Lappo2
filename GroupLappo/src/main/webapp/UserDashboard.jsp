@@ -50,8 +50,8 @@
             </div>
 
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='Index.html'">
-                    <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </button>
             </div>
         </nav>
@@ -210,6 +210,11 @@
                         <option>Screen Damage</option>
                         <option>Battery Issue</option>
                         <option>Water Damage</option>
+                        <option>Keyboard Issue</option>
+                        <option>Touchpad</option>
+                        <option>Overheating</option>
+                        <option>Storage</option>
+                        <option>Slow Performance</option>
                         <option>Software/OS</option>
                         <option>Other</option>
                     </select>

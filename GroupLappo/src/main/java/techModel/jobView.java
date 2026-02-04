@@ -5,20 +5,31 @@ import java.sql.Date;
 public class jobView {
 	String Username;
 	Date approveDate;
+	String Issue;
 	String repairDesc;
 	String currentStatus;
 	String techRemarks;
 	
-	public jobView(String username, Date approveDate, String repairDesc, String currentStatus, String techRemarks) {
+	public jobView() {}
+	
+	public jobView(String username, Date approveDate, String issue, String repairDesc, String currentStatus,
+			String techRemarks) {
 		super();
 		Username = username;
 		this.approveDate = approveDate;
+		Issue = issue;
 		this.repairDesc = repairDesc;
 		this.currentStatus = currentStatus;
 		this.techRemarks = techRemarks;
 	}
 
+	public String getIssue() {
+		return Issue;
+	}
 
+	public void setIssue(String issue) {
+		Issue = issue;
+	}
 	public String getCurrentStatus() {
 		return currentStatus;
 	}

@@ -38,8 +38,8 @@
                 </a>
             </div>
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='index.html'">
-                    <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </button>
             </div>
         </nav>
@@ -69,7 +69,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Tracking ID</th>
                                 <th>Date</th>
                                 <th>Device</th>
                                 <th>Issue</th>
@@ -86,7 +85,6 @@
         							for (Repair r : statusRepairList) {
 							%>
                             <tr>
-                                <td><%= r.getRepairID() %></td>
     							<td><%= r.getDateIssued() %></td>
     							<td><%= r.getLaptopModel() %></td>
     							<td><%= r.getIssue() %></td>

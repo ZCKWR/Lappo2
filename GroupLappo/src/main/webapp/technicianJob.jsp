@@ -46,7 +46,7 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
             </div>
 
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="window.location.href='index.html'">
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
                     <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </button>
             </div>
@@ -122,11 +122,17 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
                                         <p class="text-sm font-medium text-gray-500">Date Issued:</p>
                                         <p class="font-semibold text-gray-900" id="detail-date-issued"></p>
                                     </div>
-
+                                    
                                     <div class="border-t pt-4">
                                         <p class="text-sm font-medium text-gray-500">User's Note / Reported Problem:</p>
                                         <div id="detail-user-note" class="bg-gray-50 p-3 rounded-md text-gray-800 border border-gray-200"></div>
                                     </div>
+                                    
+                               		<div class="border-t pt-4">
+                                        <p class="text-sm font-medium text-gray-500">Issue Stated:</p>
+                                        <div id="detail-issue" class="bg-gray-50 p-3 rounded-md text-gray-800 border border-gray-200"></div>
+                                    </div>
+                                <div>
                                 </div>
                                 
                                  <!--    //Details change -->
@@ -135,9 +141,7 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
                                     <label for="currentStatus" class="block text-sm font-medium text-gray-700 mb-1">Update Repair Status</label>
 
                                      <select id="currentStatus" name="currentStatus" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
-                                        <option value="Pending Diagnosis">Pending Diagnosis</option>
-                                        <option value="Diagnosing">In Progress</option>
-                                        <option value="Awaiting">Awaiting Customer Approval</option>
+                                        <option value="In Progress" selected>In Progress</option>
                                         <option value="Awaiting Parts">Awaiting Parts</option>
                                         <option value="Repairing">Repairing</option>
                                         <option value="Ready">Ready for Collection</option>
@@ -184,6 +188,7 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
             laptopModel: "<%= job.getLaptopModel() %>",
             serialNumber: "<%= job.getSerialNumber() %>",
             userNote: "<%= job.getUserNote() %>", 
+            IssueStated: "<%= job.getIssue() %>",
             currentStatus: "<%= job.getCurrentStatus() %>",
             remarks: "<%= job.getRemarks() %>", 
             dateIssued: <%= job.getDateIssued() != null ? job.getDateIssued().getTime() : "null" %>,
@@ -271,12 +276,12 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
             document.getElementById('detail-email').textContent = data.customerEmail || 'N/A';
             document.getElementById('detail-model').textContent = data.laptopModel || 'N/A';
             document.getElementById('detail-serial').textContent = data.serialNumber || 'N/A';
+            document.getElementById('detail-issue').textContent = data.IssueStated || 'N/A' ;
             document.getElementById('detail-user-note').textContent = data.userNote || 'No note provided by user.';
             
             const date = data.dateIssued ? new Date(data.dateIssued) : null;
             document.getElementById('detail-date-issued').textContent = date ? date.toLocaleDateString() + ' at ' + date.toLocaleTimeString() : 'N/A';
-
-            document.getElementById('currentStatus').value = data.currentStatus || 'N/A' ;
+		    document.getElementById('currentStatus').value = data.currentStatus || 'N/A' ;
             document.getElementById('remarks').textContent= data.remarks || 'N/A';
         }
 

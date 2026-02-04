@@ -50,11 +50,16 @@
         <nav class="sidebar">
             <div class="sidebar-header"><i class="fas fa-laptop"></i> <span>Lappo Admin</span></div>
             <div class="sidebar-nav">
-                <a href="admin_dashboard.jsp"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+                <a href="Dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
                 <a href="admin_active_repair.jsp" class="active"><i class="fas fa-wrench"></i> <span>Repairs</span></a>
                 <a href="admin_inventory.jsp"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
                 <a href="admin_users.jsp"><i class="fas fa-users"></i> <span>Users</span></a>
                 <a href="adminProfile.jsp"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
+            </div>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="window.location.href='LoginPage.jsp'">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </button>
             </div>
         </nav>
 
@@ -69,10 +74,10 @@
             </header>
 
             <div class="filter-tabs">
-                <div class="filter-tab active" onclick="filterTable('All', this)">All Repairs</div>
-                <div class="filter-tab" onclick="filterTable('Pending', this)">Pending</div>
-                <div class="filter-tab" onclick="filterTable('In Progress', this)">In Progress</div>
-                <div class="filter-tab" onclick="filterTable('Completed', this)">Completed</div>
+                <div class="filter-tab active" onclick="filterTable(['All'], this)">All Repairs</div>
+                <div class="filter-tab" onclick="filterTable(['Awaiting for technicians to be assigned'], this)">Unassigned</div>
+                <div class="filter-tab" onclick="filterTable(['In Progress','Pending'], this)">In Progress</div>
+                <div class="filter-tab" onclick="filterTable(['Complete','Paid'], this)">Completed</div>
             </div>
 
             <div class="panel">
@@ -92,7 +97,7 @@
                         <% 
                             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, hh:mm a");
                             for(Map<String, Object> r : repairsList) { 
-                                String status = (r.get("status") != null) ? (String)r.get("status") : "Pending";
+                                String status = (r.get("status") != null) ? (String)r.get("status") : "Awaiting for technicians to be assigned";
                                 String techName = (r.get("techName") == null) ? "Unassigned" : (String)r.get("techName");
                                 Object priceObj = r.get("price");
                                 String displayPrice = (priceObj == null) ? "TBD" : "RM " + String.format("%.2f", priceObj);
@@ -153,13 +158,20 @@
     </div>
 
     <script>
-        function filterTable(status, element) {
-            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
-            element.classList.add('active');
-            document.querySelectorAll('.repair-row').forEach(row => {
-                row.style.display = (status === 'All' || row.getAttribute('data-status') === status) ? '' : 'none';
-            });
-        }
+    function filterTable(statuses, element) {
+        document.querySelectorAll('.filter-tab')
+            .forEach(tab => tab.classList.remove('active'));
+        element.classList.add('active');
+
+        document.querySelectorAll('.repair-row').forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+
+            row.style.display =
+                statuses.includes('All') || statuses.includes(rowStatus)
+                    ? ''
+                    : 'none';
+        });
+    }
 
         function openAssignModal(id) {
             document.getElementById('jobIdInput').value = id;
