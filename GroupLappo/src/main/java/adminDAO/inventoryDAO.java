@@ -128,7 +128,18 @@ public class inventoryDAO {
             if (rs.next()) {
                 int partId = rs.getInt("PartID");
                 int qtyReq = rs.getInt("QuantityRequested");
-
+                
+                
+              String repairPart = "INSERT INTO repairpart (RepairID, PartID, QuantityUsed, DateUsed) " +
+                      "SELECT RepairID, PartID, QuantityRequested, NOW() " +
+                      "FROM partrequest WHERE RequestID = ?"; 
+              
+              PreparedStatement psRepair = con.prepareStatement(repairPart);
+              psRepair.setInt(1, requestId);
+              psRepair.executeUpdate();
+              
+              
+              
                 // Step B: Deduct stock from 'part' table
                 String deductSql = "UPDATE part SET Quantity = Quantity - ? WHERE PartID = ? AND Quantity >= ?";
                 PreparedStatement psDeduct = con.prepareStatement(deductSql);

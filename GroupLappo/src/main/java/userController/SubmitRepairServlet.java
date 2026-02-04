@@ -25,6 +25,7 @@ public class SubmitRepairServlet extends HttpServlet {
         String Issue = request.getParameter("issue");
         String Description = request.getParameter("description");
         String DateIssued = request.getParameter("dateIssued");
+        String SerialNumber = request.getParameter("serialNumber");
 
         // 2. Create Repair object
         Repair repair = new Repair();
@@ -33,7 +34,8 @@ public class SubmitRepairServlet extends HttpServlet {
         repair.Issue = Issue;
         repair.Description = Description;
         repair.DateIssued = DateIssued;
-        repair.CurrentStatus = "Awaiting for technicians to be assigned"; 
+        repair.serialNumber = SerialNumber;
+        repair.CurrentStatus = "Waiting for technicians to be assigned"; 
 
         // 3. Save to database
         RepairDAO dao = new RepairDAO();

@@ -27,7 +27,7 @@ public class OngoingRepairsServlet extends HttpServlet {
         
         int activeRepairs = repairDAO.countActiveRepairs(studentID);
         int totalRepairs = repairDAO.countAllRepairs(studentID);
-        double amountDue = repairDAO.sumPendingPayments();
+        double amountDue = repairDAO.sumPendingPayments(studentID);
         int countPastRepair = repairDAO.countPastRepairs(studentID);
   
         request.setAttribute("countPastRepair", countPastRepair);
@@ -42,7 +42,7 @@ public class OngoingRepairsServlet extends HttpServlet {
         System.out.println("Repairs list size: " + repairs.size());
         
         request.setAttribute("pastRepair", pastRepair);
-        request.setAttribute("repairList", repairs);
+        request.setAttribute("ongoingRepairList", repairs);
         request.getRequestDispatcher("UserDashboard.jsp")
                .forward(request, response);
     }

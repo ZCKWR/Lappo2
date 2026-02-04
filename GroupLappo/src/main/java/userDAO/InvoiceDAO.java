@@ -17,14 +17,17 @@ public class InvoiceDAO {
         List<Invoice> invoices = new ArrayList<>();
 
         String sql = 
-        		"SELECT i.InvoiceID, " +
+        			"SELECT i.InvoiceID, " +
         	             "i.PaymentDate, " +
         	             "r.LaptopModel, " +
-        	             "r.Issue, " +        
-        	             "i.PaymentAmount " +
+        	             "r.Issue, " +
+        	             "i.PaymentAmount, " +
+        	             "i.LabourCost, " +
+        	             "i.PartCost, " +
+        	             "i.PaymentType " +
         	             "FROM invoice i " +
         	             "JOIN repair r ON i.RepairID = r.RepairID " +
-        	             "WHERE r.CustomerID = ? " +  
+        	             "WHERE r.CustomerID = ? " +
         	             "ORDER BY i.PaymentDate DESC";
 
 
@@ -41,6 +44,12 @@ public class InvoiceDAO {
                 invoice.setLaptopModel(rs.getString("LaptopModel"));
                 invoice.setIssue(rs.getString("Issue"));
                 invoice.setPaymentAmount(rs.getDouble("PaymentAmount"));
+                invoice.setLabourCost(rs.getDouble("LabourCost"));
+                invoice.setPartCost(rs.getDouble("PartCost"));
+                invoice.setPaymentType(rs.getString("PaymentType"));
+
+
+
 
                 invoices.add(invoice);
             }

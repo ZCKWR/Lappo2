@@ -73,6 +73,7 @@
                                 <th>Device</th>
                                 <th>Issue</th>
                                 <th>Technician</th>
+                                <th>Part Name Debug</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -89,6 +90,7 @@
     							<td><%= r.getLaptopModel() %></td>
     							<td><%= r.getIssue() %></td>
     							<td><%= r.getUsername() %></td>
+    							<td><%= r.getPartName() %>
     							<td style="<%
     								String status = r.getCurrentStatus();
     								if ("Complete".equalsIgnoreCase(status)) {
@@ -112,13 +114,13 @@
 
     								if ("Complete".equalsIgnoreCase(status)) {
 								%>
-        								<button onclick="openPayment(<%= r.getRepairID() %>, <%= new userDAO.RepairDAO().getPaymentAmountByRepairID(r.getRepairID())  %>)">
+									<button onclick="openInvoiceStatement(<%= r.getRepairID() %>, '<%= r.getDateIssued() %>', <%= r.getLabourCost() %>, '<%= r.getPartName() %>','<%= r.getIssue() %>' , <%= new userDAO.RepairDAO().getPaymentAmountByRepairID(r.getRepairID())%>,  <%= r.getPartTotal()  %>)">
             								Pay Now
         								</button>
 								<%
     								} else if ("Paid".equalsIgnoreCase(status)) {
 								%>
-        								<button onclick="openInvoice(<%= r.getRepairID() %>)">
+        								<button onclick="openInvoice(<%= r.getRepairID() %> )">
             								View Invoice
         								</button>
 								<%
@@ -142,9 +144,49 @@
 
         </main>
     </div>
+    
+    
+    <!-- INVOICE MODAL -->
+<div id="showInvoice" class="modal">
+    <div class="modal-content" style="text-align:left;">
+        <span class="close-btn" onclick="closeInvoiceModal()">&times;</span>
 
-    
-    
+        <div class="receipt-header" style="text-align:center;">
+            <i class="fas fa-file-invoice"
+               style="color: var(--primary-color); font-size:2.5em; margin-bottom:10px;"></i>
+            <h2>Invoice Summary</h2>
+            <p>Repair ID: <b id="inv_req">#REQ-000</b></p>
+        </div>
+
+        <hr>
+
+        <p><b>Date:</b> <span id="inv_date" id="date" >-</span></p>
+        <p><b>Issue / Service:</b> <span id="inv_issue" id="issue">-</span></p>
+
+        <hr>
+
+        <h4>Parts</h4>
+			<div id="inv_parts"></div>
+
+        <hr>
+
+        <p>Labour Cost: <b id="inv_labour">RM </b></p>
+        <p>Parts Total: <b id="inv_parts_total">RM </b></p>
+
+        <h3>Total: <span id="inv_total">RM 0.00</span></h3>
+
+        <input type="hidden" id="invRepairIDInput">
+        <input type="hidden" id="invAmountInput">
+        <input type="hidden" id="invPartName">
+        <input type="hidden" id="invLabourCost">
+        
+
+        <button class="btn-primary" onclick="proceedToPayment()">
+            Proceed to Payment
+        </button>
+    </div>
+</div>
+
     
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal">
@@ -163,8 +205,8 @@
                 <div class="form-group">
                     <label>Payment Method</label>
                     <select id="paymentMethod" name="paymentMethod" onchange="togglePaymentFields()">
-                        <option value="card">Credit/Debit Card</option>
-                        <option value="online">Online Banking (FPX)</option>
+                        <option value="Card">Credit/Debit Card</option>
+                        <option value="Online Banking">Online Banking (FPX)</option>
                     </select>
                 </div>
 
@@ -257,6 +299,52 @@
 </div>
 
     <script>
+    //For opening the invoice
+    function openInvoiceStatement(repairID, date, labourCost, partName, issue, paymentAmount, partCost) {
+        // Set Repair ID
+        document.getElementById('inv_req').textContent = "#REQ-" + repairID;
+
+        // Set Date
+        document.getElementById('inv_date').textContent = date || "-";
+        
+        //Set Issue
+        document.getElementById('inv_issue').textContent = issue || "-";
+        
+        //Set Part Name 
+        document.getElementById('inv_parts').textContent = partName || "No additional part was used ";
+        
+        //Set Part Cost Total
+        document.getElementById('inv_parts_total').textContent = "RM" +  partCost.toFixed(2);
+        
+        document.getElementById('inv_labour').textContent = "RM" +  labourCost.toFixed(2);
+
+        
+        const totalCost = labourCost + partCost;
+        
+        document.getElementById('inv_total').textContent = "RM " + totalCost.toFixed(2);
+
+        // Store for proceeding to payment
+        document.getElementById('invRepairIDInput').value = repairID;
+        document.getElementById('invAmountInput').value = totalCost.toFixed(2);
+
+        // Show invoice modal
+        document.getElementById('showInvoice').style.display = "flex";
+    }
+
+    function closeInvoiceModal() {
+        document.getElementById('showInvoice').style.display = "none";
+    }
+
+    function proceedToPayment() {
+        const repairID = Number(document.getElementById('invRepairIDInput').value);
+        const amount  = Number(document.getElementById('invAmountInput').value);
+
+        closeInvoiceModal();
+        openPayment(repairID, amount); // ✅ reuse your existing function
+    }
+    
+    
+    
         // Modal Logic
         function openBookingModal() {
             document.getElementById("bookingModal").style.display = "flex";
@@ -362,7 +450,6 @@
                 },
                 <% }} %>
             };
-        
     </script>
 
 </body>

@@ -25,7 +25,7 @@
         String status = (String)r.get("status");
         if("In Progress".equals(status)) activeRepairs++;
         if("Complete".equals(status)) completedRepairs++;
-        if("Pending".equals(status) || "Awaiting for technicians to be assigned".equals(status)) {
+        if("Pending".equals(status) || "Awaiting for technicians to be assigned".equals(status) || "Waiting for technicians to be assigned".equals(status)) {
             pendingJobsCount++;
             pendingQueue.add(r); // Add to dashboard queue
         }

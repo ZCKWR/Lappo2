@@ -16,8 +16,20 @@ public class RepairDAO {
 
         List<Repair> repairs = new ArrayList<>();
 
-        String sql = "SELECT RepairID, DateIssued, LaptopModel, Issue, CurrentStatus FROM repair where CustomerID = ? AND CurrentStatus NOT IN ('Complete', 'Paid', 'Cancelled')";
-
+        String sql = "SELECT " +
+                "r.RepairID, " +
+                "r.DateIssued, " +
+                "r.LaptopModel, " +
+                "r.Issue, " +
+                "r.CurrentStatus, " +
+                "50.00 AS LabourCost, " + 
+                "GROUP_CONCAT(p.PartName SEPARATOR ', ') AS PartNames " + 
+                "FROM repair r " +
+                "LEFT JOIN repairpart rp ON r.RepairID = rp.RepairID " +
+                "LEFT JOIN part p ON rp.PartID = p.PartID " +
+                "WHERE r.CustomerID = ? " +
+                "AND r.CurrentStatus NOT IN ('Complete', 'Paid', 'Cancelled') " +
+                "GROUP BY r.RepairID, r.DateIssued, r.LaptopModel, r.Issue, r.CurrentStatus";
         try {
             Connection conn = DBConnection.getConnection();
             System.out.println("DB Connection = " + conn);
@@ -32,6 +44,8 @@ public class RepairDAO {
                 repair.setLaptopModel(rs.getString("LaptopModel"));
                 repair.setIssue(rs.getString("Issue"));
                 repair.setCurrentStatus(rs.getString("CurrentStatus"));
+                repair.setLabourCost(rs.getDouble("LabourCost"));
+                repair.setPartName(rs.getString("PartNames"));
 
                 repairs.add(repair);
             }
@@ -87,16 +101,17 @@ public class RepairDAO {
         try {
             Connection con = DBConnection.getConnection();
 
-            String sql = "INSERT INTO repair (LaptopModel, Issue, repairDesc, DateIssued, CurrentStatus, CustomerID) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO repair (LaptopModel, Issue, SerialNumber, repairDesc, DateIssued, CurrentStatus, CustomerID) " +
+                    "VALUES (?, ?, ?, ?, ?, ?,?)";
 
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, repair.LaptopModel);
             ps.setString(2, repair.Issue);
-            ps.setString(3, repair.Description);
-            ps.setString(4, repair.DateIssued);
-            ps.setString(5, repair.CurrentStatus);
-            ps.setInt(6, repair.studentID);
+            ps.setString(3, repair.serialNumber);
+            ps.setString(4, repair.Description);
+            ps.setString(5, repair.DateIssued);
+            ps.setString(6, repair.CurrentStatus);
+            ps.setInt(7, repair.studentID);
 
             ps.executeUpdate();
             con.close();
@@ -113,11 +128,23 @@ public class RepairDAO {
         List<Repair> repairs = new ArrayList<>();    
 
         String sql =
-        	    "SELECT r.RepairID, r.DateIssued, r.LaptopModel, r.Issue, " +
-        	    "u.Username AS TechnicianName, r.CurrentStatus " +		
-        	    "FROM REPAIR r " +
-        	    "LEFT JOIN USER u ON r.AssignedTech = u.UserID AND u.UserType = 'Technician'" +
-        	    "WHERE r.CustomerID = ?";
+        		"SELECT " +
+        	             "r.RepairID, " +
+        	             "r.DateIssued, " +
+        	             "r.LaptopModel, " +
+        	             "r.Issue, " +
+        	             "r.CurrentStatus, " +
+        	             "u.Username AS TechnicianName, " +
+        	             "50.00 AS LabourCost, " + 
+        	             "IFNULL(SUM(p.UnitCost * rp.QuantityUsed), 0.00) AS TotalPartCost, " +
+        	             "GROUP_CONCAT(p.PartName SEPARATOR ', ') AS PartNames " + 
+        	             "FROM repair r " +
+        	             "LEFT JOIN `user` u ON r.AssignedTech = u.UserID AND u.UserType = 'Technician' " +
+        	             "LEFT JOIN repairpart rp ON r.RepairID = rp.RepairID " + 
+        	             "LEFT JOIN part p ON rp.PartID = p.PartID " +            
+        	             "WHERE r.CustomerID = ? " +
+        	             "GROUP BY r.RepairID, r.DateIssued, r.LaptopModel, r.Issue, r.CurrentStatus, u.Username " +
+        	             "ORDER BY r.DateIssued DESC";
 
 
         try {
@@ -134,6 +161,9 @@ public class RepairDAO {
                 repair.setIssue(rs.getString("Issue"));
                 repair.setUsername(rs.getString("TechnicianName"));
                 repair.setCurrentStatus(rs.getString("CurrentStatus"));
+                repair.setLabourCost(rs.getDouble("LabourCost"));
+                repair.setPartName(rs.getString("PartNames"));
+                repair.setPartTotal(rs.getDouble("TotalPartCost"));
 
                 repairs.add(repair);
             }
@@ -251,18 +281,22 @@ public class RepairDAO {
         return 0;
     }
     
-    public double sumPendingPayments() {
+    public double sumPendingPayments(int studentID) {
         String sql =
-            "SELECT COALESCE(SUM(i.PaymentAmount), 0) " +
-            "FROM INVOICE i " +
-            "JOIN REPAIR r ON i.RepairID = r.RepairID " +
-            "WHERE r.CurrentStatus <> 'Complete'";
+        		"SELECT COALESCE(SUM(i.PaymentAmount), 0) " +
+        	             "FROM INVOICE i " +
+        	             "JOIN REPAIR r ON i.RepairID = r.RepairID " +
+        	             "WHERE r.CurrentStatus <> 'Complete' " +
+        	             "AND i.StudentID = ?"; //
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sql)){
+        	 ps.setInt(1, studentID);
+        	
+             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) return rs.getDouble(1);
+            if (rs.next()) 
+            	return rs.getDouble(1);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -136,7 +136,7 @@
                     <tbody>
             			<%
                				// Get the list from the request
-                			List<Repair> repairList = (List<Repair>) request.getAttribute("repairList");
+                			List<Repair> repairList = (List<Repair>) request.getAttribute("ongoingRepairList");
                 			if (repairList != null) {
                     			for (Repair repair : repairList) {
             			%>
@@ -204,6 +204,12 @@
                     <label>Device Model</label>
                     <input type="text" name="laptopModel" placeholder="e.g. MacBook Pro 2021" required>
                 </div>
+                
+                <div class="form-group">
+                    <label>Serial Number</label>
+                    <input type="text" name="serialNumber" placeholder="e.g. 4CEGTF632FG" required>
+                </div>
+                
                 <div class="form-group">
                     <label>Issue Type</label>
                     <select name="issue">

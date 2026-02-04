@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="userModel.Invoice" %>
+<%@ page import="userModel.Repair" %>
+<%@ page import="userDAO.RepairDAO" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     
+    <%  List<Invoice> viewInvoice = (List<Invoice>) request.getAttribute("viewInvoices");%>
 </head>
 <body>
 <% String studentName = (String) session.getAttribute("username"); %>
@@ -87,7 +90,9 @@
     						<td><%= inv.getIssue() %></td>
     						<td>RM <%= String.format("%.2f", inv.getPaymentAmount()) %></td>
                             <td>
-        						<a href="#">View</a>
+        					<button onclick="showReceipt(<%= inv.getInvoiceID() %> )">
+            					View Invoice
+        					</button>
     						</td>
                         </tr>
                         <%
@@ -110,32 +115,32 @@
                 <h2>Payment Receipt</h2>
                 <p>Thank you for using Lappo!</p>
             </div>
-            
+         
             <div class="receipt-details">
                 <div class="receipt-row">
                     <span style="color: var(--light-text-color);">Transaction ID</span>
-                    <span id="r_id" style="font-weight: 600;">#REQ-000</span>
+                    <span id="r_id" style="font-weight: 600;"></span>
                 </div>
                 <div class="receipt-row">
                     <span style="color: var(--light-text-color);">Date</span>
-                    <span id="r_date">Jan 01, 2024</span>
+                    <span id="r_date"></span>
                 </div>
                 <div class="receipt-row">
-                    <span style="color: var(--light-text-color);">Device</span>
-                    <span id="r_device">Laptop Model</span>
+                    <span style="color: var(--light-text-color);">Labour Cost</span>
+                    <span id="r_labour"></span>
                 </div>
                  <div class="receipt-row">
-                    <span style="color: var(--light-text-color);">Service</span>
-                    <span id="r_service">Repair Type</span>
+                    <span style="color: var(--light-text-color);">Part Cost</span>
+                    <span id="r_partcost"></span>
                 </div>
                 <div class="receipt-row">
-                    <span style="color: var(--light-text-color);">Payment Method</span>
-                    <span id="r_payment">Online (FPX)</span>
+                    <span style="color: var(--light-text-color);">Payment Type</span>
+                    <span id="r_type"> </span>
                 </div>
                 
                 <div class="receipt-total">
                     <span>Total Paid</span>
-                    <span style="color: var(--primary-color);" id="r_total">RM 0.00</span>
+                    <span style="color: var(--primary-color);" id="r_total"></span>
                 </div>
             </div>
             
@@ -144,12 +149,20 @@
     </div>
 
     <script>
-        function showReceipt(id, device, service, cost, date) {
-            document.getElementById('r_id').textContent = id;
-            document.getElementById('r_device').textContent = device;
-            document.getElementById('r_service').textContent = service;
-            document.getElementById('r_total').textContent = 'RM ' + cost;
-            document.getElementById('r_date').textContent = date;
+        function showReceipt(repairID) {
+        
+        	const invoice = invoiceData[repairID];
+            if (!invoice) {
+                alert("Invoice not found");
+                return;
+            }
+            document.getElementById('r_id').textContent = repairID;
+            document.getElementById('r_type').textContent = invoice.paytype;
+            document.getElementById('r_labour').textContent = 'RM' + invoice.labour;
+            document.getElementById('r_partcost').textContent = 'RM ' + invoice.partcost;            
+            document.getElementById('r_total').textContent = 'RM ' + invoice.amount;
+            document.getElementById('r_date').textContent = invoice.date;
+            
             
             document.getElementById('receiptModal').style.display = 'flex';
         }
@@ -165,6 +178,20 @@
                 modal.style.display = "none";
             }
         }
+        
+        
+        const invoiceData = {
+                <% for (Invoice pastInv : viewInvoice) {
+                %>
+                <%= pastInv.getInvoiceID() %>: {
+                    paytype: "<%= pastInv.getPaymentType() %>",
+                    labour: "<%= pastInv.getLabourCost() %>",
+                    amount: "<%= pastInv.getPaymentAmount() %>",
+                    partcost: "<%= pastInv.getPartCost() %>",
+                    date: "<%= pastInv.getPaymentDate() %>"
+                },
+                <% } %>
+            };
     </script>
 
 </body>

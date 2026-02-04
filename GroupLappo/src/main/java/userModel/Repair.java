@@ -12,10 +12,38 @@ public class Repair {
     public String Description;
     public String Username;
     public double PaymentAmount;
+    public double labourCost;
+    public String partName;
+    public double partTotal;
+    public String serialNumber;
     
     
     
-    public void setStudentID(int studentID) {
+    public String getSerialNumber() {
+		return serialNumber;
+	}
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
+	}
+	public double getPartTotal() {
+		return partTotal;
+	}
+	public void setPartTotal(double partTotal) {
+		this.partTotal = partTotal;
+	}
+	public String getPartName() {
+		return partName;
+	}
+	public void setPartName(String partName) {
+		this.partName = partName;
+	}
+	public double getLabourCost() {
+		return labourCost;
+	}
+	public void setLabourCost(double labourCost) {
+		this.labourCost = labourCost;
+	}
+	public void setStudentID(int studentID) {
 		this.studentID = studentID;
 	}
     public int getStudentID() {

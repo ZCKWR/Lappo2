@@ -75,7 +75,7 @@
 
             <div class="filter-tabs">
                 <div class="filter-tab active" onclick="filterTable(['All'], this)">All Repairs</div>
-                <div class="filter-tab" onclick="filterTable(['Awaiting for technicians to be assigned'], this)">Unassigned</div>
+                <div class="filter-tab" onclick="filterTable(['Waiting for technicians to be assigned','Awaiting for technicians to be assigned'], this)">Unassigned</div>
                 <div class="filter-tab" onclick="filterTable(['In Progress','Pending'], this)">In Progress</div>
                 <div class="filter-tab" onclick="filterTable(['Complete','Paid'], this)">Completed</div>
             </div>
@@ -116,13 +116,17 @@
                             <td><span class="badge badge-<%= status.toLowerCase().replace(" ", "") %>"><%= status %></span></td>
                             <td><%= displayPrice %></td>
                             <td>
-                                <% if(!status.equalsIgnoreCase("Complete")) { %>
+                                <% if(status.equalsIgnoreCase("Paid")) { %>
+									<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Done</span>  
+                                <% } else if(status.equalsIgnoreCase("Complete")) {  %> 
+                                <button disabled>
+                                	<span style="color: #2ecc71;">-</span>   
+                                	</button>   	                           
+                                <% } else { %>
                                     <button class="btn-sm" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openAssignModal('<%= r.get("id") %>')">
                                         <%= techName.equals("Unassigned") ? "Assign" : "Change Tech" %>
-                                    </button>
-                                <% } else { %>
-                                    <span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Done</span>
-                                <% } %>
+                                    </button>                               
+                                     <% } %>
                             </td>
                         </tr>
                         <% } %>
