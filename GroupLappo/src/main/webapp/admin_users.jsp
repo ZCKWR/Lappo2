@@ -126,11 +126,6 @@
                                 <button class="btn-sm btn-edit" onclick="openEditModal('<%= user.get("id") %>', '<%= user.get("name") %>', '<%= user.get("email") %>', '<%= type %>')">
                                     <i class="fas fa-pen"></i>
                                 </button>
-                                <% if(!"Admin".equalsIgnoreCase(type)) { %>
-                                    <button class="btn-sm btn-delete" onclick="confirmDelete('<%= user.get("id") %>')">
-                                        <i class="fas fa-ban"></i>
-                                    </button>
-                                <% } %>
                             </td>
                         </tr>
                         <% } %>
@@ -222,12 +217,10 @@
 
         function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
-        function confirmDelete(id) {
-            if(confirm("Are you sure you want to delete User ID: " + id + "?")) {
-                // Point to the Delete Controller servlet
-                window.location.href = "DeleteUser?userId=" + id;
-            }
-        }
+        
+        <% if (request.getAttribute("errorMessage") != null) { %>
+        alert("<%= request.getAttribute("errorMessage") %>");
+    <% } %>
     </script>
 </body>
 </html>

@@ -139,12 +139,17 @@ import="techModel.partTrack"%>
                             <td><%= s.getQuantityReq() %></td>
                             <td><%= s.getDateReq() %></td>
                             <td><%= s.getDateApproved() %></td>
-                            <td>
-                                <p><span class="badge badge-warning"> <%= s.getApprovalStatus() %></span> </p>
+                            <td> 
+                            <%if(s.getApprovalStatus().equalsIgnoreCase("Pending")) {%>
+                               <span class="badge badge-warning"> <%= s.getApprovalStatus() %></span>
+                              <%}else{ %>
+						<span class="badge badge-success"> <%= s.getApprovalStatus() %></span>
+                            <%} %>
                             </td>
+                       
+                        
                         </tr>
                 
-            <%= (i < reqList.size() - 1) ? "," : "" %>
             <%    }  }
         
     %>

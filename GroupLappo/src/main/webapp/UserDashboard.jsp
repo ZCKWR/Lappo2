@@ -62,7 +62,7 @@
             <!-- Header -->
             <header class="top-header">
                 <div>
-                    <h1>Welcome, Student</h1>
+                    <h1>Welcome, <%= studentName %></h1>
                     <p>Here's what's happening with your devices today.</p>
                 </div>
                 <div class="user-profile" onclick="window.location.href='Profile'">
@@ -99,7 +99,7 @@
                 <!-- Pending Payment -->
                 <div class="stat-card">
                     <div class="stat-info">
-                        <h3>Amount Due</h3>
+                        <h3>Amount Paid</h3>
                         <p class="number">RM <%= String.format("%.2f", request.getAttribute("amountDue")) %></p>
                     </div>
                     <div class="stat-icon icon-orange">
@@ -130,6 +130,7 @@
                             <th>Device</th>
                             <th>Issue</th>
                             <th>Status</th>
+                            <th>Action</th>
                            
                         </tr>
                     </thead>
@@ -146,6 +147,15 @@
                     			<td><%= repair.getLaptopModel() %></td>
                     			<td><%= repair.getIssue() %></td>
                     			<td><%= repair.getCurrentStatus() %></td>
+                    			<td>
+                    		<% if ("Pending".equalsIgnoreCase(repair.getCurrentStatus())) { %>
+                    			<button class="btn-sm btn-delete" onclick="confirmCancel('<%= repair.getRepairID() %>')">
+                                        <Span>Cancel Booking</Span>
+                                </button>
+                			
+                		
+                			</td>	
+                			<%} %>
                 			</tr>
             			<%
                     			}
@@ -262,6 +272,28 @@
                 modal.style.display = "none";
             }
         }
+        
+        function confirmCancel(id) {
+            if (!confirm("Cancel booking For Booking ID " + id + "?")) return;
+
+            fetch("CancelBooking", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "repairID=" + encodeURIComponent(id)
+            })
+            .then(res => res.text())
+            .then(msg => {
+                msg = msg.trim();
+                if (msg === "success") {
+                    alert("Booking cancelled.");
+                    location.reload();
+                } else {
+                    alert(msg);
+                }
+            })
+            .catch(() => alert("Server error."));
+        }
+
 
     </script>
 

@@ -318,7 +318,7 @@
         }
         //delete for inventorys
         
-        function confirmDelete(id) {
+function confirmDelete(id) {
     if (!confirm("Permanently delete Part ID: " + id + "?")) {
         return;
     }
@@ -330,19 +330,23 @@
         },
         body: "partID=" + encodeURIComponent(id)
     })
-    .then(response => {
-        if (response.ok) {
-            // reload inventory after delete
+    .then(response => response.text())   
+    .then(message => {
+        if (message === "success") {
+            alert("Part deleted successfully.");
             window.location.reload();
         } else {
-            alert("Failed to delete part.");
+            
+            alert(message);
         }
     })
     .catch(error => {
         console.error(error);
-        alert("Error deleting part.");
+        alert("Server error while deleting part.");
     });
 }
+
+        
     
         
     </script>

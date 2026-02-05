@@ -252,6 +252,7 @@ import="javax.naming.*, javax.sql.*" %>
         .badge-warning { background-color: #fff3cd; color: #856404; }
         .badge-success { background-color: #d4edda; color: #155724; }
         .badge-danger { background-color: #f8d7da; color: #721c24; }
+        .badge-complete {background-color: #f8d7da; color: #721c24;}
 
         .data-table {
             width: 100%;
@@ -389,7 +390,6 @@ import="javax.naming.*, javax.sql.*" %>
             <div class="panel"> 
                 <div class="panel-header">
                     <h2>Job Queue</h2>
-                    <span class="badge badge-warning">3 Pending</span>
                 </div>
                 <table class="data-table">
                     <thead>
@@ -427,7 +427,7 @@ import="javax.naming.*, javax.sql.*" %>
                 }
             } else {
         	%>
-                <tr><td colspan="3">No data received from Servlet.</td></tr>
+                <tr><td colspan="3">No records found.</td></tr>
        	 	<% 
            	 } 
        		 %> 
@@ -438,7 +438,6 @@ import="javax.naming.*, javax.sql.*" %>
             <div class="panel"> 
                 <div class="panel-header">
                     <h2>Past Job</h2>
-                    <span class="badge badge-warning">3 Pending</span>
                 </div>
                 <table class="data-table">
                     <thead>
@@ -467,7 +466,7 @@ import="javax.naming.*, javax.sql.*" %>
                             <td><%= past.getApproveDate() %></td>
                             <td><%= past.getIssue() %></td>
                             <td><%= past.getRepairDesc() %></td>
-                            <td><span class="badge badge-warning"><%= past.getCurrentStatus() %></span></td>
+                            <td><span class="badge badge-complete"><%= past.getCurrentStatus() %></span></td>
                             <td>
                                 <p> <%= past.getTechRemarks() %> </p>
                             </td>

@@ -105,11 +105,11 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
                                             <p class="font-semibold text-gray-900" id="detail-customer-name"></p>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-medium text-gray-500">Owner Email:</p>
+                                            <p class="text-sm font-medium text-gray-500">Laptop Model:</p>
                                             <p class="font-semibold text-gray-900" id="detail-email"></p>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-medium text-gray-500">Laptop Model:</p>
+                                            <p class="text-sm font-medium text-gray-500">Owner Email:</p>
                                             <p class="font-semibold text-gray-900" id="detail-model"></p>
                                         </div>
                                         <div>
@@ -144,8 +144,7 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
                                         <option value="In Progress" selected>In Progress</option>
                                         <option value="Awaiting Parts">Awaiting Parts</option>
                                         <option value="Repairing">Repairing</option>
-                                        <option value="Ready">Ready for Collection</option>
-                                        <option value="Complete">Complete / Collected</option>
+                                        <option value="Complete">Complete</option>
                                     </select>
                                 </div>
                                 <div>

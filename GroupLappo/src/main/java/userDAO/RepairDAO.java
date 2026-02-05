@@ -1,6 +1,7 @@
 package userDAO;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -351,6 +352,27 @@ public class RepairDAO {
 
         return amount;
     }
+	public boolean cancelBooking(String repairID) {
+
+	    try {
+	    	Class.forName("com.mysql.jdbc.Driver");
+		    Connection con = DriverManager.getConnection(
+		    "jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!"); 
+	    	
+	    	  String sql = "UPDATE repair "
+	    	  		+ "SET CurrentStatus = 'Cancelled'"
+	    	  		+ "WHERE RepairID = ?;";
+	    	  
+	    	  PreparedStatement ps = con.prepareStatement(sql);
+	  	      ps.setString(1, repairID);
+
+	  	    return ps.executeUpdate() > 0;
+	    	
+	    }catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return false;	         	
+}
    
          
     }

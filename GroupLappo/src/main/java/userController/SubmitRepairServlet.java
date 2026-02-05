@@ -16,7 +16,7 @@ public class SubmitRepairServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    	
+    	    	
 		HttpSession session = request.getSession();
 		Integer studentID = (Integer) session.getAttribute("userID");
 
@@ -35,11 +35,12 @@ public class SubmitRepairServlet extends HttpServlet {
         repair.Description = Description;
         repair.DateIssued = DateIssued;
         repair.serialNumber = SerialNumber;
-        repair.CurrentStatus = "Waiting for technicians to be assigned"; 
+        repair.CurrentStatus = "Pending"; 
 
         // 3. Save to database
         RepairDAO dao = new RepairDAO();
         dao.insertRepair(repair);
+
 
         // 4. Redirect (VERY IMPORTANT)
         response.sendRedirect("ongoingRepairs");

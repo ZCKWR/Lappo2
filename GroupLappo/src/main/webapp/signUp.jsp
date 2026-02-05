@@ -138,8 +138,6 @@
 
         <form action="<%= request.getContextPath() %>/SignUpServlet" method="post">
  
-   
-            
             <!-- Email Input Group -->
             <div class="form-group">
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>

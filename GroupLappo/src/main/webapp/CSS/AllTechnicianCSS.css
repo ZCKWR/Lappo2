@@ -219,6 +219,8 @@ body {
 .badge-success { background-color: #d4edda; color: #155724; }
 .badge-danger { background-color: #f8d7da; color: #721c24; }
 .badge-warning { background-color: #fff3cd; color: rgb(0, 0, 0)}
+.badge-complete {background-color: #3272f5; color: #ffffff;}
+
 
 /* Action Buttons */
 .btn-sm {

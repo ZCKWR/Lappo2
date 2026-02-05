@@ -33,15 +33,33 @@ public class InventoryDelete extends HttpServlet {
 
         int partID = Integer.parseInt(request.getParameter("partID"));
         
-        System.out.println(partID);
         inventoryDAO dao = new inventoryDAO();
-
-        if (!dao.isPartUsed(partID)) {
-            dao.deletePart(partID);
+        
+        boolean deleted = new inventoryDAO().deletePart(partID);
+        
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
+        
+        if (deleted) {
+            response.getWriter().write("success");
+        } else {
+            response.getWriter().write("Cannot delete part. The part has been used.");
         }
+
+/*
+        if (dao.isPartUsed(partID)) {
+        	request.setAttribute("ErrorMessage", "Item has been used.Cannot be deleted!!!");
+            request.getRequestDispatcher("admin_inventory.jsp").forward(request, response);
+            return;
+        }else {
+        	 dao.deletePart(partID);
+        }
+        
+        */
+        
 		
         
-        request.getRequestDispatcher("admin_inventory.jsp").forward(request, response);
+      //  request.getRequestDispatcher("admin_inventory.jsp").forward(request, response);
 		
 	}
 

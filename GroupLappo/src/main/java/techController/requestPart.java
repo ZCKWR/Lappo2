@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.io.PrintWriter;
 
 
 /**
@@ -93,7 +92,7 @@ public class requestPart extends HttpServlet {
     		String repairSql = "SELECT RepairID, CurrentStatus, DateIssued, LaptopModel, repairDesc " +
                     "FROM repair " +
                     "WHERE AssignedTech = ? " +
-                    "AND CurrentStatus NOT IN ('Complete', 'Collected', 'Cancelled') " +
+                    "AND CurrentStatus NOT IN ('Complete', 'Paid', 'Cancelled') " +
                     "ORDER BY DateIssued DESC";
     		
             PreparedStatement stmt = con.prepareStatement(repairSql);
@@ -229,14 +228,11 @@ public class requestPart extends HttpServlet {
         int row = ps.executeUpdate();
         
         if (row > 0) {
-            response.sendRedirect("technicianRequest.jsp?success=true");
+            response.sendRedirect("requestPart");
         } else {
             response.sendRedirect("technicianRequest.jsp?error=true");
         }
         
-        response.sendRedirect("requestPart");
-		
-		return;
 
 		} 
 		}catch (Exception e) {
