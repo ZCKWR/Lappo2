@@ -56,7 +56,7 @@ public class requestPart extends HttpServlet {
 		int totalApproved = dao.countTotalPartApproved(technicianIds);
 		
 		reqsPart = dao.viewPartRequest(technicianId);
-		int totalReqPart = reqsPart.size();
+		
 		
 		repairList = dao.viewRepairList(technicianId);
 		
@@ -67,10 +67,7 @@ public class requestPart extends HttpServlet {
         session.setAttribute("reqsPart", reqsPart);
 
         session.setAttribute("repairList", repairList);
-
-        session.setAttribute("totalReqPart", totalReqPart);
-       
-            
+           
         request.getRequestDispatcher("technicianRequest.jsp").forward(request, response);
         
      

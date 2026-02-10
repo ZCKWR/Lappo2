@@ -41,11 +41,13 @@ public class updateDAO {
 	    
 	    if(res == 1)
 	    	status = true;
-		
+	    
+	    con.close();
+	    
 	}catch (ClassNotFoundException e) {
-        e.printStackTrace(); // Catch driver errors
+        e.printStackTrace(); 
     } catch (SQLException e) {
-        e.printStackTrace(); // Catch SQL errors
+        e.printStackTrace(); 
     }
 		return status;
 	}
@@ -73,6 +75,7 @@ public class updateDAO {
 	            bean.setTechPhone(rs.getString("UserPhoneNumber"));
 	            bean.setTechAddress(rs.getString("UserAddress"));
 	        }
+	        con.close();
 
 	    } catch (Exception e) {
 	        e.printStackTrace();

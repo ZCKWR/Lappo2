@@ -71,8 +71,7 @@ public class reqPartDAO {
 	    }
 	    
 	    return count;	 
-	         		 
-	        		 
+	         		 	        		 
 	}
 	
 	public int countTotalPartApproved(int techID) {

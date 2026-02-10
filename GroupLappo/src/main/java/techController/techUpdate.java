@@ -47,55 +47,10 @@ public class techUpdate extends HttpServlet {
 	    
 	    session.setAttribute("techProfile", bean);
 
-		
-		
-		List<techProfile> profile = new ArrayList<>();
-		
-		
-		try {
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection con = DriverManager.getConnection(
-		"jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!");
-		
-		if(technicianId != null) {
-			
-			
-			String sql = "SELECT u.UserID, u.Username, u.UserEmail, u.UserAddress, u.UserPhoneNumber " +
-		             "FROM user u " +
-		             "JOIN technician t ON u.UserID = t.UserID " + // Added space here
-		             "WHERE u.UserID = ?";
-		
-		
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, technicianId);
-        ResultSet rs = ps.executeQuery();
-        
-        System.out.println("Current Tech ID: " + technicianId);
-        
-        
-        while (rs.next()) {
-            // Match the constructor in your JavaBean
-            techProfile profiles = new techProfile(
-                rs.getInt("UserID"), 
-                rs.getString("Username"),
-                rs.getString("UserEmail"),
-                rs.getString("UserAddress"),
-                rs.getString("UserPhoneNumber")
-
-            );
-            profile.add(profiles);
-        }
-
-        session.setAttribute("profile", profile);
-		
-		con.close();
-	} 
-		}catch (Exception e) {
-		e.printStackTrace();
-	}
 		request.getRequestDispatcher("technicianProfile.jsp").forward(request, response);
+
+		
 	}
-	
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
