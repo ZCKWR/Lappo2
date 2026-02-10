@@ -40,8 +40,14 @@
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
         .badge-pending { background: #f1c40f; color: #fff; }
         .badge-inprogress { background: #3498db; color: #fff; }
+        .badge-repairing { background: #3498db; color: #fff; }   
         .badge-completed { background: #2ecc71; color: #fff; }
-        .badge-tech { background: #9b59b6; color: #fff; }
+        .badge-tech { background: #9b59b6; color: #fff; } 
+        .badge-paid { background: #c62828; color: #fff; }          
+        .badge-complete { background: #c62828; color: #fff; }   
+        .badge-cancelled { background: #2e7d32; color: #fff; }
+        
+        
     </style>
 </head>
 <body>
@@ -75,8 +81,8 @@
 
             <div class="filter-tabs">
                 <div class="filter-tab active" onclick="filterTable(['All'], this)">All Repairs</div>
-                <div class="filter-tab" onclick="filterTable(['Waiting for technicians to be assigned','Awaiting for technicians to be assigned'], this)">Unassigned</div>
-                <div class="filter-tab" onclick="filterTable(['In Progress','Pending'], this)">In Progress</div>
+                <div class="filter-tab" onclick="filterTable(['Pending'], this)">Unassigned</div>
+                <div class="filter-tab" onclick="filterTable(['In Progress','Awaiting Parts','Repairing'], this)">In Progress</div>
                 <div class="filter-tab" onclick="filterTable(['Complete','Paid'], this)">Completed</div>
             </div>
 
@@ -118,7 +124,7 @@
                             <td>
                                 <% if(status.equalsIgnoreCase("Paid")) { %>
 									<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Done</span>  
-                                <% } else if(status.equalsIgnoreCase("Complete")) {  %> 
+                                <% } else if(status.equalsIgnoreCase("Complete") || (status.equalsIgnoreCase("Cancelled"))) {  %> 
                                 <button disabled>
                                 	<span style="color: #2ecc71;">-</span>   
                                 	</button>   	                           

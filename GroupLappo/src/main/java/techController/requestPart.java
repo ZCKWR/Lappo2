@@ -1,3 +1,5 @@
+
+
 package techController;
 
 import jakarta.servlet.ServletException;
@@ -13,9 +15,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -45,116 +45,32 @@ public class requestPart extends HttpServlet {
 		Integer technicianId = (Integer) session.getAttribute("userID");
 		
 		int technicianIds = (int) session.getAttribute("userID");
-		
-		List<partTrack> repairList = new ArrayList<>();
-		
-
-		
-		reqPartDAO dao2 = new reqPartDAO();
-		
 		reqPartDAO dao = new reqPartDAO();
-		
-		reqPartDAO dao3 = new reqPartDAO();
-		
+					
+		List<partTrack> repairList = new ArrayList<>();
+	
 		List<reqPart> reqsPart = new ArrayList<>();
-		
-		
+	
 		int totalRequests = dao.countTotalPartRequests(technicianIds);
-		int totalPending = dao2.countTotalPartPending(technicianIds);
-		int totalApproved = dao3.countTotalPartApproved(technicianIds);
+		int totalPending = dao.countTotalPartPending(technicianIds);
+		int totalApproved = dao.countTotalPartApproved(technicianIds);
+		
+		reqsPart = dao.viewPartRequest(technicianId);
+		int totalReqPart = reqsPart.size();
+		
+		repairList = dao.viewRepairList(technicianId);
 		
 		request.setAttribute("partReqCount", totalRequests);
 		request.setAttribute("partPenCount", totalPending);
 		request.setAttribute("partApproveCount", totalApproved);
 		
+        session.setAttribute("reqsPart", reqsPart);
 
+        session.setAttribute("repairList", repairList);
 
-        try {
-        	Class.forName("com.mysql.jdbc.Driver");
-    		Connection con = DriverManager.getConnection(
-    		"jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!");
-            // Your SQL query
-    		
-			
-    		String sql = "SELECT " +
-    	             "pr.RepairID, " +
-    	             "p.PartName, " +
-    	             "p.Manufacturer, " +
-    	             "pr.QuantityRequested, " +
-    	             "pr.DateRequest, " +
-    	             "pr.DateApproved, " +
-    	             "pr.ApprovalStatus " +
-    	             "FROM partrequest pr " +
-    	             "JOIN part p ON pr.PartID = p.PartID " +
-    	             "JOIN repair r ON pr.RepairID = r.RepairID " +
-    	             "WHERE pr.RequestedBy = ?";
-    		
-    		String repairSql = "SELECT RepairID, CurrentStatus, DateIssued, LaptopModel, repairDesc " +
-                    "FROM repair " +
-                    "WHERE AssignedTech = ? " +
-                    "AND CurrentStatus NOT IN ('Complete', 'Paid', 'Cancelled') " +
-                    "ORDER BY DateIssued DESC";
-    		
-            PreparedStatement stmt = con.prepareStatement(repairSql);
-            stmt.setInt(1, technicianIds);
-
-	        
-           PreparedStatement ps = con.prepareStatement(sql);
-           ps.setInt(1, technicianId);
-           ResultSet rs = ps.executeQuery();
-           
-           
-           
-           ResultSet sp = stmt.executeQuery();
-           while(sp.next()) {
-           	partTrack pt = new partTrack();
-           			pt.setRepairID(sp.getInt("RepairID"));
-           			pt.setStatus(sp.getString("CurrentStatus"));
-                    pt.setDate(sp.getString("DateIssued")); 
-                    pt.setModel(sp.getString("LaptopModel"));
-                    pt.setProblem(sp.getString("repairDesc"));
-                    
-
-           	repairList.add(pt);   
-           
-           }
-           
-           session.setAttribute("repairList", repairList);
-   		
-
-            // Display results in HTML table
-          
-           
-            while (rs.next()) {
-            	reqPart reqP = new reqPart(
-                rs.getInt("RepairID"),
-                rs.getString("PartName"),
-                rs.getString("manufacturer"),
-                rs.getInt("QuantityRequested"),
-                rs.getDate("DateRequest"),
-                rs.getDate("DateApproved"),
-                rs.getString("ApprovalStatus")
-              );  
-            	
-                reqsPart.add(reqP);    
-
-            }
+        session.setAttribute("totalReqPart", totalReqPart);
+       
             
-            int totalReqPart = reqsPart.size();
-            
-
-            session.setAttribute("totalReqPart", totalReqPart);
- 
-            session.setAttribute("reqsPart", reqsPart);
-          
-            request.setAttribute("reqsPart", reqsPart);
-
-            
-            con.close();
-            } catch (Exception e) {
-            	throw new ServletException(e);
-            	
-            }
         request.getRequestDispatcher("technicianRequest.jsp").forward(request, response);
         
      
@@ -167,42 +83,19 @@ public class requestPart extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
-		System.out.println("===== FORM PARAMETERS =====");
-
-		request.getParameterMap().forEach((key, value) -> {
-		    System.out.println(key + " = " + Arrays.toString(value));
-		});
-
-		System.out.println("===========================");
 		
 		HttpSession session = request.getSession();
 		Integer technicianId = (Integer) session.getAttribute("userID");
 		
-	
 		
 		String repairID = request.getParameter("repairID");
 		String partID = request.getParameter("partID");
 		String quantity =request.getParameter("quantityReq");
 		
 		
-        
-		
-		response.setContentType("text/html");
-		
-	    System.out.println("HALLO");
-
-	    System.out.println("repairId = " + request.getParameter("repairID"));
-	    System.out.println("partID = " + request.getParameter("partID"));
-	    System.out.println("ApprovalStatus = " + request.getParameter("quantityReq"));
-	    System.out.println("repairID = " + request.getParameter("repairID"));
-	    System.out.println("ApprovalStatus = " + "Pending");
-
-
-	       Connection con = null;
-		
 		try {
 		Class.forName("com.mysql.jdbc.Driver");
-		 con = DriverManager.getConnection(
+		 Connection con = DriverManager.getConnection(
 		"jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!");
 
 			
@@ -211,17 +104,12 @@ public class requestPart extends HttpServlet {
 		           + "VALUES (?, ?, ?, ?, ?)";
 		
 
-		try( PreparedStatement ps = con.prepareStatement(sql)){
+		PreparedStatement ps = con.prepareStatement(sql);
 		
-		
-        ps.setInt(1, Integer.parseInt(quantity));
-        
-        ps.setString(2, "Pending"); // Default approval status
-        
-        ps.setInt(3, Integer.parseInt(repairID));
-        
-        ps.setInt(4, Integer.parseInt(partID));
-        
+        ps.setInt(1, Integer.parseInt(quantity));      
+        ps.setString(2, "Pending");         
+        ps.setInt(3, Integer.parseInt(repairID));        
+        ps.setInt(4, Integer.parseInt(partID));       
         ps.setInt(5,  technicianId);
         
         
@@ -232,16 +120,15 @@ public class requestPart extends HttpServlet {
         } else {
             response.sendRedirect("technicianRequest.jsp?error=true");
         }
-        
-
-		} 
+        	
 		}catch (Exception e) {
             e.printStackTrace();
             response.getWriter().println("Error: " + e.getMessage());
         }
 		
 	}
-	}
+}
+	
 		
 
 		    

@@ -30,7 +30,7 @@
         <!-- SIDEBAR (Light Theme) -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-laptop"></i> <span>Welcome <%= studentName %></span>
+                <i class="fas fa-laptop"></i> <span> <%= studentName %></span>
             </div>
             
             <div class="sidebar-nav">

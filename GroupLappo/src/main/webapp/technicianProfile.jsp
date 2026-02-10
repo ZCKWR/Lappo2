@@ -40,7 +40,7 @@ import="javax.naming.*, javax.sql.*" %>
                 <a href="jobController" >
                     <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
                 </a>
-                <a href="jobServlet">
+                <a href="activeJob">
                     <i class="fas fa-wrench"></i> <span>Job</span>
                 </a>
                 <a href="requestPart">
@@ -119,7 +119,7 @@ import="javax.naming.*, javax.sql.*" %>
 
         Swal.fire({
             title: 'Confirm Update',
-            text: 'Are you sure you want to update this repair record?',
+            text: 'Are you sure you want to update your profile?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, update it',

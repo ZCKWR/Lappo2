@@ -25,13 +25,11 @@
         String status = (String)r.get("status");
         if("In Progress".equals(status)) activeRepairs++;
         if("Complete".equals(status)) completedRepairs++;
-        if("Pending".equals(status) || "Awaiting for technicians to be assigned".equals(status) || "Waiting for technicians to be assigned".equals(status)) {
+        if("Pending".equals(status)) {
             pendingJobsCount++;
             pendingQueue.add(r); // Add to dashboard queue
         }
     }
-    // Simple count for total users (can be moved to userDAO)
-    totalUsers = 10; // Placeholder: you can add a getCount() in userDAO
 
     // 4. Low Stock Logic (Assuming you have a method in repairDAO or similar)
     // For now, keeping your existing logic but it's better to move to a DAO later
@@ -126,7 +124,6 @@
                     </thead>
                     <tbody>
                         <% 
-                            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
                             if(pendingQueue.isEmpty()) {
                         %>
                             <tr><td colspan="5" style="text-align:center; padding: 20px;">No pending jobs found.</td></tr>

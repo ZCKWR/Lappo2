@@ -29,7 +29,7 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-laptop"></i> <span>Welcome <%= studentName %></span>
+                <i class="fas fa-laptop"></i> <span> <%= studentName %></span>
             </div>
             <div class="sidebar-nav">
                <a href="ongoingRepairs" >
@@ -130,7 +130,7 @@
 
         Swal.fire({
             title: 'Confirm Update',
-            text: 'Are you sure you want to update this your profile?',
+            text: 'Are you sure you want to update  your profile?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, update it',

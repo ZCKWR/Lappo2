@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import techModel.jobView;
+import userModel.Repair;
 
 public class dashboardDAO {
 	public int countCompletedRepairs(int techID) {
@@ -67,7 +68,6 @@ public class dashboardDAO {
 	        ResultSet rs = ps.executeQuery();
 	        
 	        while (rs.next()) {
-	            // Match the constructor in your JavaBean
 	            jobView s = new jobView();
 	                s.setUsername(rs.getString("Username")); 
 	                s.setApproveDate(rs.getDate("DateIssued"));
@@ -90,6 +90,47 @@ public class dashboardDAO {
 	    
 	    return pastJob;
 	}
+	
+	 public List<jobView> displayAllActiveJobs(int techid) {
+		
+		List<jobView> job = new ArrayList<>();
 
+		
+		try {
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = DriverManager.getConnection(
+		"jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!");
+		
+			String sql = "SELECT u.Username, r.DateIssued, r.Issue, r.repairDesc, r.CurrentStatus, r.TechnicianRemarks " +
+		             "FROM repair r " +
+		             "JOIN user u ON r.CustomerID = u.UserID " +
+		             "WHERE r.AssignedTech = ? AND CurrentStatus NOT IN ('Complete', 'Paid')";
+		
+		
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, techid);
+        ResultSet rs = ps.executeQuery();
+        
+        
+        while (rs.next()) {
+
+            jobView s = new jobView(
+                rs.getString("Username"), 
+                rs.getDate("DateIssued"),
+                rs.getString("Issue"),
+                rs.getString("repairDesc"),
+                rs.getString("CurrentStatus"),
+                rs.getString("TechnicianRemarks")
+
+            );
+            job.add(s);
+        }
+		
+		}catch (Exception e) {
+    		e.printStackTrace();
+    	}
+		return job;
+	}
 }
+
 	

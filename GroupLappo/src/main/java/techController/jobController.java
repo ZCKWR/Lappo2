@@ -10,6 +10,7 @@ import techDAO.dashboardDAO;
 
 import java.io.IOException;
 import techModel.jobView;
+import userModel.Repair;
 import jakarta.servlet.RequestDispatcher;
 import java.io.PrintWriter;
 import java.sql.*;
@@ -46,59 +47,19 @@ public class jobController extends HttpServlet {
 		
 		List<jobView> pastComplete = dao.viewPastRepairs(technicianId);
 		
-		for (jobView job : pastComplete) {
-		    System.out.println(job.getUsername());
-		}
-		
+        List<jobView> activeRepairs = dao.displayAllActiveJobs(technicianId);
+        
+        int assignedJobsCount = activeRepairs.size();
+        
+        session.setAttribute("assignedJobsCount", assignedJobsCount);
+        
+        session.setAttribute("ActiveJob", activeRepairs);
+			
 		session.setAttribute("pastRepairs", pastComplete);
 		
 		request.setAttribute("completedCount", totalCompleted);
-		
-		
-		List<jobView> job = new ArrayList<>();
-		
-		
-		try {
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection con = DriverManager.getConnection(
-		"jdbc:mysql://localhost:3306/lappo2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "Zack1234!");
-		
-		if(technicianId != null) {
-			String sql = "SELECT u.Username, r.DateIssued, r.Issue, r.repairDesc, r.CurrentStatus, r.TechnicianRemarks " +
-		             "FROM repair r " +
-		             "JOIN user u ON r.CustomerID = u.UserID " +
-		             "WHERE r.AssignedTech = ? AND CurrentStatus NOT IN ('Complete', 'Paid')";
-		
-		
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, technicianId);
-        ResultSet rs = ps.executeQuery();
-        
-        //System.out.println("Current Tech ID: " + technicianId);
-        
-        while (rs.next()) {
-            // Match the constructor in your JavaBean
-            jobView s = new jobView(
-                rs.getString("Username"), 
-                rs.getDate("DateIssued"),
-                rs.getString("Issue"),
-                rs.getString("repairDesc"),
-                rs.getString("CurrentStatus"),
-                rs.getString("TechnicianRemarks")
 
-            );
-            job.add(s);
-        }
-        int assignedJobsCount = job.size();
 
-        session.setAttribute("ActiveJob", job);
-        session.setAttribute("assignedJobsCount", assignedJobsCount);
-		
-		con.close();
-	} 
-		}catch (Exception e) {
-		e.printStackTrace();
-	}
 		request.getRequestDispatcher("technicianDashboard.jsp").forward(request, response);
 	}
 	

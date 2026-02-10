@@ -21,7 +21,7 @@
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-laptop"></i> <span>Welcome <%= studentName %></span>
+                <i class="fas fa-laptop"></i> <span> <%= studentName %></span>
             </div>
             <div class="sidebar-nav">
                 <a href="ongoingRepairs" >
@@ -69,11 +69,11 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                            	<th>Repair ID Number</th>
                                 <th>Date</th>
                                 <th>Device</th>
                                 <th>Issue</th>
                                 <th>Technician</th>
-                                <th>Part Name Debug</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -86,11 +86,11 @@
         							for (Repair r : statusRepairList) {
 							%>
                             <tr>
+                            	<td><%= r.getRepairID() %></td>
     							<td><%= r.getDateIssued() %></td>
     							<td><%= r.getLaptopModel() %></td>
     							<td><%= r.getIssue() %></td>
     							<td><%= r.getUsername() %></td>
-    							<td><%= r.getPartName() %>
     							<td style="<%
     								String status = r.getCurrentStatus();
     								if ("Complete".equalsIgnoreCase(status)) {

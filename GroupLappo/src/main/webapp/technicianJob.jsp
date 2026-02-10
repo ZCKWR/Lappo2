@@ -34,7 +34,7 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
                  <a href="jobController" >
                     <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
                 </a>
-                <a href="jobServlet" class="active">
+                <a href="activeJob" class="active">
                     <i class="fas fa-wrench"></i> <span>Job</span>
                 </a>
                 <a href="requestPart">
@@ -88,7 +88,7 @@ import="java.util.List, techModel.jobAssigned" import="java.text.SimpleDateForma
                         <div id="detail-panel" class="panel min-h-[300px]">
                             <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3" id="detail-title">Select a Job to View Details</h2>
 
-                            <form  action="jobServlet" method="post" id="update-form" onsubmit="return confirmUpdate(event);" >
+                            <form  action="activeJob" method="post" id="update-form" onsubmit="return confirmUpdate(event);" >
                            
                             
                                 <input type="hidden" id="job-doc-id" name="RepairID">

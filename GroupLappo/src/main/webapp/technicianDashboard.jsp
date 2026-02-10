@@ -325,7 +325,7 @@ import="javax.naming.*, javax.sql.*" %>
                 <a href="jobController" class="active">
                     <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
                 </a>
-                <a href="jobServlet">
+                <a href="activeJob">
                     <i class="fas fa-wrench"></i> <span>Job</span>
                 </a>
                 <a href="requestPart">

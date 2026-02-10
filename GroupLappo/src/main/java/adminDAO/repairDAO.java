@@ -16,10 +16,10 @@ public class repairDAO {
                 "u.Username AS CustomerName, " +
                 "u.UserID AS CustomerID, " +
                 "r.LaptopModel, " +
-                "r.issue, " +       // <--- New Item 1
-                "r.repairDesc, " +  // <--- New Item 2
+                "r.issue, " +       
+                "r.repairDesc, " +  
                 "r.CurrentStatus, " +
-                "r.DateIssued, " +
+                "DATE_FORMAT(r.DateIssued, '%Y-%m-%d') as DateIssued, " +
                 "tech.Username AS TechName, " +
                 "(i.LabourCost + i.PartCost) AS CalculatedPrice " +
                 "FROM repair r " +
